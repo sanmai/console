@@ -48,9 +48,10 @@ jobs:
       - name: Install dependencies
         run: |
           composer remove --no-update --dev \
-              phan/phan phpstan/phpstan vimeo/psalm \
+              phpstan/phpstan vimeo/psalm \
               infection/infection friendsofphp/php-cs-fixer
           composer update --prefer-dist --no-interaction --no-progress
+          composer dump-autoload --optimize --dev
 
       - name: Execute tests
         run: |
