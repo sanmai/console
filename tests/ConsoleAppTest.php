@@ -72,4 +72,12 @@ final class ConsoleAppTest extends TestCase
 
         $this->assertStringContainsString('Hello, world!', $tester->getDisplay());
     }
+
+    public function testVersion(): void
+    {
+        $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class));
+        $version = $app->getVersion();
+
+        $this->assertSame('UNKNOWN', $version);
+    }
 }
