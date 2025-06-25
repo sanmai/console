@@ -35,7 +35,6 @@ final class ConsoleApp extends Application
         parent::__construct('Console App');
     }
 
-    /** @codeCoverageIgnore */
     #[Override]
     public function getVersion(): string
     {
