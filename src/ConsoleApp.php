@@ -22,10 +22,11 @@ namespace ConsoleApp;
 
 use Symfony\Component\Console\Application;
 use VersionInfo\PlaceholderVersionReader;
+use Override;
 
 use function Pipeline\take;
 
-class ConsoleApp extends Application
+final class ConsoleApp extends Application
 {
     public const VERSION_INFO = '$Format:%h%d by %an +%ae$';
 
@@ -35,12 +36,14 @@ class ConsoleApp extends Application
     }
 
     /** @codeCoverageIgnore */
+    #[Override]
     public function getVersion(): string
     {
         $versionReader = new PlaceholderVersionReader(self::VERSION_INFO);
         return $versionReader->getVersionString() ?? parent::getVersion();
     }
 
+    #[Override]
     protected function getDefaultCommands(): array
     {
         return take(parent::getDefaultCommands())

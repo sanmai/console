@@ -25,6 +25,7 @@ use IteratorAggregate;
 use Later\Interfaces\Deferred;
 use Symfony\Component\Console\Command\Command;
 use Traversable;
+use Override;
 
 use function is_subclass_of;
 use function Later\later;
@@ -36,10 +37,11 @@ use function str_ends_with;
  * Command provider that discovers commands from Composer's classmap
  *
  * @implements IteratorAggregate<Command>
+ * @final
  */
 class ClassmapCommandProvider implements IteratorAggregate
 {
-    /** @var Deferred<iterable<Command>> */
+    /** @var Deferred<Traversable<Command>> */
     private readonly Deferred $commands;
 
     public function __construct(private readonly ClassLoader $classLoader)
@@ -48,9 +50,9 @@ class ClassmapCommandProvider implements IteratorAggregate
     }
 
     /**
-     * @return iterable<Command>
+     * @return Traversable<Command>
      */
-    private function listCommands(): iterable
+    private function listCommands(): Traversable
     {
         return take($this->classLoader->getClassMap())
             ->stream()
@@ -85,9 +87,11 @@ class ClassmapCommandProvider implements IteratorAggregate
      */
     private static function newCommand(string $class): Command
     {
+        /** @psalm-suppress UnsafeInstantiation */
         return new $class();
     }
 
+    #[Override]
     public function getIterator(): Traversable
     {
         return $this->commands->get();
