@@ -1,0 +1,55 @@
+{
+    "name": "sanmai/console",
+    "description": "Ready-made extensible console application using Symfony Console component",
+    "license": "Apache-2.0",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Alexey Kopytko",
+            "email": "alexey@kopytko.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "sanmai/later": "^0.1.7",
+        "sanmai/pipeline": "^6.17",
+        "sanmai/version-info": "^0.2",
+        "symfony/console": "^6.0 || ^7.0"
+    },
+    "require-dev": {
+        "composer/composer": "^2.2",
+        "ergebnis/composer-normalize": "^2.8",
+        "friendsofphp/php-cs-fixer": "^3.17",
+        "infection/infection": ">=0.10.5",
+        "league/pipeline": "^0.3 || ^1.0",
+        "phan/phan": ">=1.1",
+        "php-coveralls/php-coveralls": "^2.4.1",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": ">=0.10 <2",
+        "phpunit/phpunit": ">=9.4 <12",
+        "vimeo/psalm": ">=2"
+    },
+    "autoload": {
+        "psr-4": {
+            "ConsoleApp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\ConsoleApp\\": "tests/"
+        }
+    },
+    "bin": [
+        "bin/console"
+    ],
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "infection/extension-installer": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "preferred-install": "dist"
+    }
+}
