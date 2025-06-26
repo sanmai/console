@@ -25,8 +25,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'hello',
-    description: 'Say hello to the world',
-    aliases: ['hello-world']
 )]
 class HelloCommand extends Command
 {

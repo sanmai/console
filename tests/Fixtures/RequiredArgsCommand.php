@@ -22,11 +22,10 @@ namespace Tests\ConsoleApp\Fixtures;
 
 use Symfony\Component\Console\Command\Command;
 
-final class CommandWithRequiredArgsCommand extends Command
+final class RequiredArgsCommand extends Command
 {
     public function __construct(
         private readonly string $requiredParam,
-        private readonly int $requiredNumber
     ) {
         parent::__construct();
     }
