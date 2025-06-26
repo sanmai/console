@@ -20,8 +20,12 @@ declare(strict_types=1);
 
 namespace Tests\ConsoleApp\Fixtures;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 
+#[AsCommand(
+    name: 'optional-args',
+)]
 final class OptionalArgsCommand extends Command
 {
     public function __construct(
