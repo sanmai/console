@@ -26,6 +26,7 @@ use Later\Interfaces\Deferred;
 use Symfony\Component\Console\Command\Command;
 use Traversable;
 use Override;
+use ReflectionClass;
 
 use function is_subclass_of;
 use function Later\later;
@@ -61,6 +62,7 @@ class ClassmapCommandProvider implements IteratorAggregate
             ->filter(self::hasCommandInFilename(...))
             ->keys()
             ->filter(self::isCommandSubclass(...))
+            ->filter(self::canBeInstantiatedWithoutArguments(...))
             ->cast(self::newCommand(...));
     }
 
@@ -80,6 +82,27 @@ class ClassmapCommandProvider implements IteratorAggregate
     private static function isCommandSubclass(string $class): bool
     {
         return is_subclass_of($class, Command::class);
+    }
+
+    /**
+     * @param class-string<Command> $class
+     */
+    private static function canBeInstantiatedWithoutArguments(string $class): bool
+    {
+        $reflection = new ReflectionClass($class);
+        $constructor = $reflection->getConstructor();
+
+        if (null === $constructor) {
+            return true;
+        }
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if (!$parameter->isDefaultValueAvailable() && !$parameter->allowsNull()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

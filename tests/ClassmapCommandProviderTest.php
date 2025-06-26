@@ -23,10 +23,15 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\ClassmapCommandProvider;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
+use Tests\ConsoleApp\Fixtures\CommandWithRequiredArgsCommand;
+use Tests\ConsoleApp\Fixtures\CommandWithOptionalArgsCommand;
+use Tests\ConsoleApp\Fixtures\CommandWithMixedArgsCommand;
 use ReflectionClass;
 
 use function iterator_to_array;
 use function Pipeline\take;
+use function array_map;
+use function get_class;
 
 #[CoversClass(ClassmapCommandProvider::class)]
 class ClassmapCommandProviderTest extends TestCase
@@ -72,6 +77,62 @@ class ClassmapCommandProviderTest extends TestCase
         $provider = new ClassmapCommandProvider($loader);
 
         $this->assertCount(0, iterator_to_array($provider));
+    }
+
+    public function testItIgnoresCommandsWithRequiredConstructorArguments(): void
+    {
+        $loader = $this->createMock(ClassLoader::class);
+
+        $loader->expects($this->once())
+            ->method('getClassMap')
+            ->willReturn(self::classNamesToPaths(
+                CommandWithRequiredArgsCommand::class,
+                CommandWithMixedArgsCommand::class,
+            ));
+
+        $provider = new ClassmapCommandProvider($loader);
+
+        $this->assertCount(0, iterator_to_array($provider));
+    }
+
+    public function testItAcceptsCommandsWithOptionalConstructorArguments(): void
+    {
+        $loader = $this->createMock(ClassLoader::class);
+
+        $loader->expects($this->once())
+            ->method('getClassMap')
+            ->willReturn(self::classNamesToPaths(CommandWithOptionalArgsCommand::class));
+
+        $provider = new ClassmapCommandProvider($loader);
+
+        $commands = iterator_to_array($provider);
+        $this->assertCount(1, $commands);
+        $this->assertInstanceOf(CommandWithOptionalArgsCommand::class, $commands[0]);
+    }
+
+    public function testItFiltersCommandsWithMixedConstructorArguments(): void
+    {
+        $loader = $this->createMock(ClassLoader::class);
+
+        $loader->expects($this->once())
+            ->method('getClassMap')
+            ->willReturn(self::classNamesToPaths(
+                HelloCommand::class,
+                CommandWithOptionalArgsCommand::class,
+                CommandWithRequiredArgsCommand::class,
+                CommandWithMixedArgsCommand::class,
+            ));
+
+        $provider = new ClassmapCommandProvider($loader);
+
+        $commands = iterator_to_array($provider);
+        $this->assertCount(2, $commands);
+
+        $commandClasses = array_map(fn($cmd) => get_class($cmd), $commands);
+        $this->assertContains(HelloCommand::class, $commandClasses);
+        $this->assertContains(CommandWithOptionalArgsCommand::class, $commandClasses);
+        $this->assertNotContains(CommandWithRequiredArgsCommand::class, $commandClasses);
+        $this->assertNotContains(CommandWithMixedArgsCommand::class, $commandClasses);
     }
 
     private static function classNamesToPaths(string ...$classNames): array

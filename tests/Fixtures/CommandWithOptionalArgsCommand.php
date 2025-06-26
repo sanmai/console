@@ -16,29 +16,19 @@
  * limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace Tests\ConsoleApp\Fixtures;
 
-use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(
-    name: 'hello',
-    description: 'Say hello to the world',
-    aliases: ['hello-world']
-)]
-class HelloCommand extends Command
+final class CommandWithOptionalArgsCommand extends Command
 {
     public function __construct(
-        private readonly string $message = 'Hello, world!',
+        private readonly string $param = 'default',
+        private readonly ?int $nullableNumber = null
     ) {
         parent::__construct();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $output->writeln($this->message);
-        return Command::SUCCESS;
-    }
 }
