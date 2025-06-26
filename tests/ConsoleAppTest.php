@@ -89,7 +89,6 @@ final class ConsoleAppTest extends TestCase
             ->method('getVersionString')
             ->willReturn('1.2.3');
 
-
         $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class), $versionReader);
         $version = $app->getVersion();
 
