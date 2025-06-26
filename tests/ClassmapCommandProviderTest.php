@@ -22,12 +22,12 @@ use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\ClassmapCommandProvider\Helper;
+use Symfony\Component\Console\Command\Command;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
-use Tests\ConsoleApp\Fixtures\RequiredArgsCommand;
 use ReflectionClass;
 
 use function iterator_to_array;
-use function Pipeline\take;
 
 #[CoversClass(ClassmapCommandProvider::class)]
 class ClassmapCommandProviderTest extends TestCase
@@ -46,50 +46,47 @@ class ClassmapCommandProviderTest extends TestCase
         $this->assertCount(0, $provider);
     }
 
-    public function testItFindsCommand(): void
+    public function testItUsesHelper(): void
     {
-        $loader = $this->configureClassLoaderWith(
-            HelloCommand::class,
-        );
-
-        $provider = new ClassmapCommandProvider($loader);
-
-        $this->assertInstanceOf(HelloCommand::class, iterator_to_array($provider)[0]);
-    }
-
-    public function testItIgnoresNonCommandClasses(): void
-    {
-        $loader = $this->configureClassLoaderWith(
-            self::class,
-            ClassLoader::class,
-        );
-
-        $provider = new ClassmapCommandProvider($loader);
-
-        $this->assertCount(0, iterator_to_array($provider));
-    }
-
-    public function testItIgnoresCommandsWithRequiredConstructorArguments(): void
-    {
-        $loader = $this->configureClassLoaderWith(RequiredArgsCommand::class);
-
-        $provider = new ClassmapCommandProvider($loader);
-
-        $this->assertCount(0, iterator_to_array($provider));
-    }
-
-    private function configureClassLoaderWith(string ...$classNames): ClassLoader
-    {
-        $namesPaths = take($classNames)
-            ->map(static fn(string $className) => yield $className => (new ReflectionClass($className))->getFileName())
-            ->toAssoc();
+        $fullPath = (new ReflectionClass(HelloCommand::class))->getFileName();
 
         $loader = $this->createMock(ClassLoader::class);
 
         $loader->expects($this->once())
             ->method('getClassMap')
-            ->willReturn($namesPaths);
+            ->willReturn([HelloCommand::class => '../../src/HelloCommand.php']);
 
-        return $loader;
+        $helper = $this->createMock(Helper::class);
+
+        $helper->expects($this->once())
+            ->method('realpath')
+            ->with('../../src/HelloCommand.php')
+            ->willReturn($fullPath);
+
+        $helper->expects($this->once())
+            ->method('isNotVendoredDependency')
+            ->with($fullPath)
+            ->willReturn(true);
+
+        $helper->expects($this->once())
+            ->method('hasCommandInFilename')
+            ->with($fullPath)
+            ->willReturn(true);
+
+        $helper->expects($this->once())
+            ->method('isCommandSubclass')
+            ->with(HelloCommand::class)
+            ->willReturn(true);
+
+        $mockCommand = $this->createMock(Command::class);
+
+        $helper->expects($this->once())
+            ->method('newCommand')
+            ->with(HelloCommand::class)
+            ->willReturn($mockCommand);
+
+        $provider = new ClassmapCommandProvider($loader, $helper);
+
+        $this->assertSame([$mockCommand], iterator_to_array($provider, false));
     }
 }
