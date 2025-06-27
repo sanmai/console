@@ -16,7 +16,7 @@ composer require sanmai/console
 composer dump-autoload --optimize
 ```
 
-> Why --optimize? Command discovery uses Composer's classmap, which requires an optimized autoloader.
+> Why `--optimize`? Command discovery uses Composer's classmap, which requires an optimized autoloader.
 
 ## Quick Start
 
@@ -112,7 +112,7 @@ define('APP_ENV', $_ENV['APP_ENV'] ?? 'production');
 ## Troubleshooting
 
 Commands not showing up?
-- Run `composer dump-autoload --optimize`
+- Run `composer dump-autoload --optimize` (add `--dev` if your commands are in autoload-dev)
 - Verify your command files end with `Command.php`
 - Check that commands extend `Symfony\Component\Console\Command\Command`
 - Commands in `vendor/` are ignored by default
