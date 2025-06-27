@@ -21,11 +21,9 @@ namespace Tests\ConsoleApp\ClassmapCommandProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\ClassmapCommandProvider\Helper;
-use Symfony\Component\Console\Command\Command;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 
-use function is_subclass_of;
 use function realpath;
 
 #[CoversClass(Helper::class)]
@@ -79,4 +77,3 @@ class HelperTest extends TestCase
         $this->assertNull($this->helper->newCommand(AbstractCommand::class));
     }
 }
-
