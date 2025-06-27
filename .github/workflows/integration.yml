@@ -1,28 +1,32 @@
 name: Bootstrap Integration Test
 
 on:
-  push:
-    branches: [ main, master ]
   pull_request:
-    branches: [ main, master ]
+  push:
+    branches:
+      - main
+      - v*.*
+  schedule:
+    # Run at noon JST (3:00 UTC) on the 15th of every month
+    - cron: '0 3 15 * *'
 
 jobs:
   bootstrap-integration:
     runs-on: ubuntu-latest
-    
+
     steps:
     - name: Checkout console library
       uses: actions/checkout@v4
-    
+
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.3'
         coverage: none
-    
+
     - name: Install library dependencies
       run: composer install --no-dev --optimize-autoloader
-    
+
     - name: Create test project
       run: |
         mkdir test-project
@@ -57,7 +61,7 @@ jobs:
             }
         }
         EOF
-    
+
     - name: Create bootstrap script
       run: |
         cd test-project
@@ -81,7 +85,7 @@ jobs:
         // Note: In a real project, you might want to find the loader from spl_autoload_functions()
         // For this test, we know vendor/autoload.php was already loaded
         EOF
-    
+
     - name: Create test command
       run: |
         cd test-project
@@ -116,24 +120,24 @@ jobs:
             }
         }
         EOF
-    
+
     - name: Install test project dependencies
       run: |
         cd test-project
         composer install --optimize-autoloader
-    
+
     - name: Test console list command
       run: |
         cd test-project
         echo "=== Testing console list command ==="
         vendor/bin/console list
-    
+
     - name: Test custom bootstrap command
       run: |
         cd test-project
         echo "=== Testing custom bootstrap command ==="
         vendor/bin/console test:bootstrap
-    
+
     - name: Verify bootstrap log was created
       run: |
         cd test-project
@@ -145,7 +149,7 @@ jobs:
           echo "✗ Bootstrap log file NOT found"
           exit 1
         fi
-    
+
     - name: Test that command appears in list
       run: |
         cd test-project
