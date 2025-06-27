@@ -38,6 +38,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class HelloCommand extends Command
 {
+    // Avoid side effects in constructors - commands are instantiated during discovery.
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Hello, World!');
@@ -68,7 +70,7 @@ This library provides a ready-made `vendor/bin/console` executable that automati
 2. Finding classes that end with `Command.php`
 3. Loading those that extend `Symfony\Component\Console\Command\Command`
 4. Filtering out vendored files
-5. Filtering out commands that require constructor arguments
+5. Instantiating each command (commands that throw exceptions or errors are skipped)
 
 ## The Problem It Solves
 
