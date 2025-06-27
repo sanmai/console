@@ -32,7 +32,7 @@ use function is_readable;
 use function is_array;
 use function json_decode;
 
-final class ConfigLoader
+class ConfigLoader
 {
     public function __construct(
         private readonly string $workingDirectory = ''
@@ -45,22 +45,13 @@ final class ConfigLoader
      */
     public function loadConfig(): array
     {
-        if (!class_exists(InstalledVersions::class)) {
+        $composerJsonPath = $this->getComposerJsonPath();
+        if (null === $composerJsonPath) {
             return [];
         }
 
-        // Get the install path for the root package
-        $rootPackage = InstalledVersions::getRootPackage();
-        $installPath = $rootPackage['install_path'];
-
-        $composerJsonPath = $installPath . '/composer.json';
-
-        if (!file_exists($composerJsonPath) || !is_readable($composerJsonPath)) {
-            return [];
-        }
-
-        $content = file_get_contents($composerJsonPath);
-        if (false === $content) {
+        $content = $this->readFile($composerJsonPath);
+        if (null === $content) {
             return [];
         }
 
@@ -69,11 +60,61 @@ final class ConfigLoader
             return [];
         }
 
-        if (!isset($composer['extra']) || !is_array($composer['extra'])) {
+        return $this->extractConsoleConfig($composer);
+    }
+
+    /**
+     * Get the path to composer.json
+     * @return string|null Returns null if InstalledVersions is not available
+     */
+    protected function getComposerJsonPath(): ?string
+    {
+        if (!class_exists(InstalledVersions::class)) {
+            return null;
+        }
+
+        // Get the install path for the root package
+        $rootPackage = InstalledVersions::getRootPackage();
+        $installPath = $rootPackage['install_path'];
+
+        return $installPath . '/composer.json';
+    }
+
+    /**
+     * Read file contents
+     * @return string|null Returns null if file doesn't exist, is not readable, or read fails
+     */
+    protected function readFile(string $path): ?string
+    {
+        if (!file_exists($path) || !is_readable($path)) {
+            return null;
+        }
+
+        $content = @file_get_contents($path);
+
+        return false !== $content ? $content : null;
+    }
+
+    /**
+     * Extract console configuration from composer data
+     * @param array<string, mixed> $composer
+     * @return array<string, mixed>
+     */
+    protected function extractConsoleConfig(array $composer): array
+    {
+        if (!isset($composer['extra'])) {
             return [];
         }
 
-        if (!isset($composer['extra']['console']) || !is_array($composer['extra']['console'])) {
+        if (!is_array($composer['extra'])) {
+            return [];
+        }
+
+        if (!isset($composer['extra']['console'])) {
+            return [];
+        }
+
+        if (!is_array($composer['extra']['console'])) {
             return [];
         }
 
@@ -115,7 +156,7 @@ final class ConfigLoader
 
     private function getWorkingDirectory(): string
     {
-        if ($this->workingDirectory) {
+        if ('' !== $this->workingDirectory) {
             return $this->workingDirectory;
         }
 
