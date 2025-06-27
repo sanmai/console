@@ -27,6 +27,7 @@ use Symfony\Component\Process\Process;
 use function chdir;
 use function getcwd;
 use function file_exists;
+use function realpath;
 
 #[CoversNothing]
 class IntegrationBootstrapTest extends TestCase

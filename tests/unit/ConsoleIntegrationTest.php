@@ -31,7 +31,7 @@ class ConsoleIntegrationTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$consolePath = realpath(__DIR__ . '/../bin/console');
+        self::$consolePath = realpath(__DIR__ . '/../../bin/console');
     }
 
     public function testConsoleExecutesHelloCommand(): void
