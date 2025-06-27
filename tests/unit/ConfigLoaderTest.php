@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use ConsoleApp\ConfigLoader;
 use Composer\Autoload\ClassLoader;
 use Exception;
+use RuntimeException;
 
 use function array_diff;
 use function chmod;
@@ -71,9 +72,8 @@ class ConfigLoaderTest extends TestCase
         // Expect no calls to unregister since file doesn't exist
         $classLoader->expects($this->never())->method('unregister');
 
-        $result = $configLoader->loadCustomInit($classLoader, 'nonexistent.php');
-
-        $this->assertNull($result);
+        $this->expectException(RuntimeException::class);
+        $configLoader->loadCustomInit($classLoader, 'nonexistent.php');
     }
 
     public function testLoadCustomInitWithUnreadableScript(): void
@@ -89,12 +89,13 @@ class ConfigLoaderTest extends TestCase
         // Expect no calls to unregister since file is unreadable
         $classLoader->expects($this->never())->method('unregister');
 
-        $result = $configLoader->loadCustomInit($classLoader, 'unreadable.php');
-
-        $this->assertNull($result);
-
-        // Cleanup
-        chmod($scriptPath, 0644);
+        try {
+            $this->expectException(RuntimeException::class);
+            $configLoader->loadCustomInit($classLoader, 'unreadable.php');
+        } finally {
+            // Restore permissions so we can delete the file
+            chmod($scriptPath, 0644);
+        }
     }
 
     public function testLoadCustomInitWithValidScript(): void

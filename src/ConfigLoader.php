@@ -27,13 +27,10 @@ use RuntimeException;
 use function class_exists;
 use function file_exists;
 use function file_get_contents;
-use function fwrite;
 use function getcwd;
 use function is_readable;
 use function is_array;
 use function json_decode;
-
-use const STDERR;
 
 final class ConfigLoader
 {
@@ -97,13 +94,11 @@ final class ConfigLoader
         $initPath = $this->getWorkingDirectory() . '/' . $initScript;
 
         if (!file_exists($initPath)) {
-            $this->writeWarning("Bootstrap script not found: $initScript");
-            return null;
+            throw new RuntimeException("Bootstrap script not found: $initScript");
         }
 
         if (!is_readable($initPath)) {
-            $this->writeWarning("Bootstrap script not readable: $initScript");
-            return null;
+            throw new RuntimeException("Bootstrap script not readable: $initScript");
         }
 
         // Load the custom bootstrap script (like PHPUnit does)
@@ -130,10 +125,5 @@ final class ConfigLoader
         }
 
         return $cwd;
-    }
-
-    private function writeWarning(string $message): void
-    {
-        fwrite(STDERR, "Warning: $message\n");
     }
 }
