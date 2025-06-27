@@ -19,11 +19,14 @@
 
 declare(strict_types=1);
 
+use Composer\InstalledVersions;
 use ConsoleApp\ClassmapCommandProvider;
 use ConsoleApp\ConsoleApp;
+use ConsoleApp\ConfigLoader;
+use Composer\Autoload\ClassLoader;
 
+/** @var ClassLoader|null $classLoader */
 $classLoader = null;
-
 foreach ([
     $GLOBALS['_composer_autoload_path'] ?? 'vendor/autoload.php',
     __DIR__ . '/../../autoload.php',
@@ -38,7 +41,6 @@ foreach ([
     break;
 }
 
-
 if (null === $classLoader) {
     fwrite(
         STDERR,
@@ -47,6 +49,19 @@ if (null === $classLoader) {
     );
 
     exit(1);
+}
+
+// Now we have access to Composer classes - check for custom init
+$configLoader = new ConfigLoader(
+    $classLoader,
+    InstalledVersions::getRootPackage(),
+);
+
+$config = $configLoader->getBootstrapPath();
+if ('' !== $config) {
+    $configLoader->handleAutoloader(
+        static fn() => require_once $config
+    );
 }
 
 $app = new ConsoleApp(new ClassmapCommandProvider($classLoader));

@@ -2,5 +2,5 @@
 /vendor
 /build
 *.cache
-.?*
+/.?*
 *.sh

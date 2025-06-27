@@ -36,7 +36,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\ConsoleApp\\": "tests/"
+            "Tests\\ConsoleApp\\": "tests/unit/"
         }
     },
     "bin": [

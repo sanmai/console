@@ -16,7 +16,7 @@
     </projectFiles>
 
     <extraFiles>
-        <directory name="tests" />
+        <directory name="tests/unit" />
     </extraFiles>
 
     <issueHandlers>
