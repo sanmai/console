@@ -80,36 +80,3 @@ class HelperTest extends TestCase
     }
 }
 
-/*
-
-class Helper
-{
-    public function realpath(string $filename): string
-    {
-        return realpath($filename) ?: $filename;
-    }
-
-    public function isNotVendoredDependency(string $filename): bool
-    {
-        return !str_contains($filename, '/vendor/');
-    }
-
-    public function hasCommandInFilename(string $filename): bool
-    {
-        return str_ends_with($filename, 'Command.php');
-    }
-
-    public function isCommandSubclass(string $class): bool
-    {
-        return is_subclass_of($class, Command::class);
-    }
-
-
-    public function newCommand(string $class): Command
-    {
-        return new $class();
-    }
-
-}
-
- */
