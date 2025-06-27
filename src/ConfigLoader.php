@@ -20,151 +20,55 @@ declare(strict_types=1);
 
 namespace ConsoleApp;
 
-use Composer\Autoload\ClassLoader;
 use Composer\InstalledVersions;
-use RuntimeException;
+use SplFileObject;
+use Composer\Autoload\ClassLoader;
 
-use function class_exists;
-use function file_exists;
-use function file_get_contents;
-use function getcwd;
-use function is_readable;
-use function is_array;
 use function json_decode;
+use function spl_autoload_functions;
+use function count;
+
+use const JSON_THROW_ON_ERROR;
 
 class ConfigLoader
 {
+    /** @var array{install_path: string} */
+    private readonly array $rootPackage;
+
+    /**
+     * @param array{install_path: string}|null $rootPackage
+     */
     public function __construct(
-        private readonly string $workingDirectory = ''
-    ) {}
-
-    /**
-     * Loads configuration from the root package composer.json
-     *
-     * @return array<string, mixed>
-     */
-    public function loadConfig(): array
-    {
-        $composerJsonPath = $this->getComposerJsonPath();
-        if (null === $composerJsonPath) {
-            return [];
-        }
-
-        $content = $this->readFile($composerJsonPath);
-        if (null === $content) {
-            return [];
-        }
-
-        $composer = json_decode($content, true);
-        if (!is_array($composer)) {
-            return [];
-        }
-
-        return $this->extractConsoleConfig($composer);
+        readonly private ClassLoader $classLoader,
+        ?array $rootPackage = null,
+    ) {
+        $this->rootPackage = $rootPackage ?? InstalledVersions::getRootPackage();
     }
 
-    /**
-     * Get the path to composer.json
-     * @return string|null Returns null if InstalledVersions is not available
-     */
-    protected function getComposerJsonPath(): ?string
+    public function getBootstrapPath(): string
     {
-        if (!class_exists(InstalledVersions::class)) {
-            return null;
-        }
-
-        // Get the install path for the root package
-        $rootPackage = InstalledVersions::getRootPackage();
-        $installPath = $rootPackage['install_path'];
-
-        return $installPath . '/composer.json';
+        $path = $this->rootPackage['install_path'] . '/composer.json';
+        $file = new SplFileObject($path, 'r');
+        $json = json_decode($file->fread($file->getSize()), associative: true, flags: JSON_THROW_ON_ERROR);
+        return $json['extra']['console']['bootstrap'] ?? '';
     }
 
-    /**
-     * Read file contents
-     * @return string|null Returns null if file doesn't exist, is not readable, or read fails
-     */
-    protected function readFile(string $path): ?string
+    public function handleAutoloader(callable $callback): void
     {
-        if (!file_exists($path) || !is_readable($path)) {
-            return null;
+        $beforeCount = $this->getAutoloaderCount();
+
+        $callback();
+
+        if ($this->getAutoloaderCount() <= $beforeCount) {
+            return;
         }
 
-        $content = @file_get_contents($path);
-
-        return false !== $content ? $content : null;
+        // If the autoloader was registered, we need to unregister it
+        $this->classLoader->unregister();
     }
 
-    /**
-     * Extract console configuration from composer data
-     * @param array<string, mixed> $composer
-     * @return array<string, mixed>
-     */
-    protected function extractConsoleConfig(array $composer): array
+    public function getAutoloaderCount(): int
     {
-        if (!isset($composer['extra'])) {
-            return [];
-        }
-
-        if (!is_array($composer['extra'])) {
-            return [];
-        }
-
-        if (!isset($composer['extra']['console'])) {
-            return [];
-        }
-
-        if (!is_array($composer['extra']['console'])) {
-            return [];
-        }
-
-        /** @var array<string, mixed> */
-        return $composer['extra']['console'];
-    }
-
-    /**
-     * Loads a custom bootstrap script
-     *
-     * Similar to PHPUnit, bootstrap scripts are included for their side effects.
-     * They can optionally return a ClassLoader instance to use for command discovery.
-     */
-    public function loadCustomInit(
-        ClassLoader $initialLoader,
-        string $initScript
-    ): ?ClassLoader {
-        $initPath = $this->getWorkingDirectory() . '/' . $initScript;
-
-        if (!file_exists($initPath)) {
-            throw new RuntimeException("Bootstrap script not found: $initScript");
-        }
-
-        if (!is_readable($initPath)) {
-            throw new RuntimeException("Bootstrap script not readable: $initScript");
-        }
-
-        // Load the custom bootstrap script (like PHPUnit does)
-        $result = require $initPath;
-
-        // If bootstrap returns a ClassLoader, use it
-        // Otherwise, return null to indicate the initial loader should be used
-        if ($result instanceof ClassLoader) {
-            return $result;
-        }
-
-        return null;
-    }
-
-    private function getWorkingDirectory(): string
-    {
-        if ('' !== $this->workingDirectory) {
-            return $this->workingDirectory;
-        }
-
-        $cwd = getcwd();
-        if (false === $cwd) {
-            throw new RuntimeException('Unable to determine current working directory');
-        }
-
-        return $cwd;
+        return count(spl_autoload_functions());
     }
 }

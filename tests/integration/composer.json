@@ -19,7 +19,7 @@
     },
     "extra": {
         "console": {
-            "bootstrap": ["bootstrap.php"]
+            "bootstrap": "bootstrap.php"
         }
     }
 }

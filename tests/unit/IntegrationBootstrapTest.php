@@ -122,7 +122,6 @@ class IntegrationBootstrapTest extends TestCase
 
         $this->assertTrue($process->isSuccessful(), 'Bootstrap command failed');
         $this->assertStringContainsString('Custom bootstrap was loaded successfully', $process->getOutput());
-        $this->assertStringContainsString('Bootstrap time:', $process->getOutput());
     }
 
     public function testBootstrapScriptIsLoaded(): void
@@ -142,7 +141,7 @@ class IntegrationBootstrapTest extends TestCase
 
         // Verify the command confirms bootstrap was loaded
         $this->assertStringContainsString(
-            '✓ Custom bootstrap was loaded successfully!',
+            'Custom bootstrap was loaded successfully!',
             $process->getOutput()
         );
     }

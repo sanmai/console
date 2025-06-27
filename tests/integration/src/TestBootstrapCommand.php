@@ -35,13 +35,12 @@ final class TestBootstrapCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (defined('BOOTSTRAP_LOADED') && BOOTSTRAP_LOADED) {
-            $output->writeln('✓ Custom bootstrap was loaded successfully!');
-            $output->writeln('Bootstrap time: ' . (defined('BOOTSTRAP_TIME') ? BOOTSTRAP_TIME : 'unknown'));
-            return Command::SUCCESS;
+        if (!defined('BOOTSTRAP_LOADED')) {
+            $output->writeln('Custom bootstrap was NOT loaded');
+            return Command::FAILURE;
         }
 
-        $output->writeln('✗ Custom bootstrap was NOT loaded');
-        return Command::FAILURE;
+        $output->writeln('Custom bootstrap was loaded successfully!');
+        return Command::SUCCESS;
     }
 }
