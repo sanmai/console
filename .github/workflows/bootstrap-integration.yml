@@ -77,13 +77,9 @@ jobs:
         // Log bootstrap execution
         file_put_contents(__DIR__ . '/bootstrap.log', "Bootstrap executed at " . BOOTSTRAP_TIME . "\n");
         
-        // Load and return the autoloader
-        $loader = require __DIR__ . '/vendor/autoload.php';
-        
-        // Add test app namespace
-        $loader->addPsr4('TestApp\\', __DIR__ . '/src/');
-        
-        return $loader;
+        // The autoloader is already active, just modify it
+        // Note: In a real project, you might want to find the loader from spl_autoload_functions()
+        // For this test, we know vendor/autoload.php was already loaded
         EOF
     
     - name: Create test command

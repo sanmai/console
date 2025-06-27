@@ -85,7 +85,10 @@ final class ConfigLoader
     }
 
     /**
-     * Loads a custom init script and returns the ClassLoader it provides
+     * Loads a custom bootstrap script
+     *
+     * Similar to PHPUnit, bootstrap scripts are included for their side effects.
+     * They can optionally return a ClassLoader instance to use for command discovery.
      */
     public function loadCustomInit(
         ClassLoader $initialLoader,
@@ -94,35 +97,25 @@ final class ConfigLoader
         $initPath = $this->getWorkingDirectory() . '/' . $initScript;
 
         if (!file_exists($initPath)) {
-            $this->writeWarning("Init script not found: $initScript");
+            $this->writeWarning("Bootstrap script not found: $initScript");
             return null;
         }
 
         if (!is_readable($initPath)) {
-            $this->writeWarning("Init script not readable: $initScript");
+            $this->writeWarning("Bootstrap script not readable: $initScript");
             return null;
         }
 
-        // Unregister the initial autoloader before loading custom init
-        $initialLoader->unregister();
+        // Load the custom bootstrap script (like PHPUnit does)
+        $result = require $initPath;
 
-        try {
-            // Load the custom init script - it should handle autoloading
-            $result = require $initPath;
-
-            // Custom init should return the real ClassLoader
-            if ($result instanceof ClassLoader) {
-                return $result;
-            }
-
-            $this->writeWarning("Init script did not return ClassLoader: $initScript");
-            return null;
-        } finally {
-            // If we didn't get a loader, re-register the initial one
-            if (!isset($result) || !$result instanceof ClassLoader) {
-                $initialLoader->register();
-            }
+        // If bootstrap returns a ClassLoader, use it
+        // Otherwise, return null to indicate the initial loader should be used
+        if ($result instanceof ClassLoader) {
+            return $result;
         }
+
+        return null;
     }
 
     private function getWorkingDirectory(): string

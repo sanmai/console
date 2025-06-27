@@ -35,6 +35,7 @@ use function scandir;
 use function sys_get_temp_dir;
 use function uniqid;
 use function unlink;
+use function defined;
 
 #[CoversClass(ConfigLoader::class)]
 class ConfigLoaderTest extends TestCase
@@ -107,8 +108,8 @@ class ConfigLoaderTest extends TestCase
         file_put_contents($scriptPath, '<?php return $GLOBALS["test_loader"];');
         $GLOBALS['test_loader'] = $customLoader;
 
-        // Expect unregister to be called before loading the script
-        $initialLoader->expects($this->once())->method('unregister');
+        // No unregister expected - loader stays active
+        $initialLoader->expects($this->never())->method('unregister');
 
         $result = $configLoader->loadCustomInit($initialLoader, 'init.php');
 
@@ -123,17 +124,18 @@ class ConfigLoaderTest extends TestCase
         $configLoader = new ConfigLoader($this->tempDir);
         $initialLoader = $this->createMock(ClassLoader::class);
 
-        // Create a script that returns something other than ClassLoader
-        $scriptPath = $this->tempDir . '/invalid.php';
-        file_put_contents($scriptPath, '<?php return "not a classloader";');
+        // Create a script that doesn't return a ClassLoader (like PHPUnit bootstrap)
+        $scriptPath = $this->tempDir . '/bootstrap.php';
+        file_put_contents($scriptPath, '<?php define("TEST_BOOTSTRAP_LOADED", true);');
 
-        // Expect unregister to be called, then register again when script fails
-        $initialLoader->expects($this->once())->method('unregister');
-        $initialLoader->expects($this->once())->method('register');
+        // No unregister/register calls expected - loader stays active
+        $initialLoader->expects($this->never())->method('unregister');
+        $initialLoader->expects($this->never())->method('register');
 
-        $result = $configLoader->loadCustomInit($initialLoader, 'invalid.php');
+        $result = $configLoader->loadCustomInit($initialLoader, 'bootstrap.php');
 
         $this->assertNull($result);
+        $this->assertTrue(defined('TEST_BOOTSTRAP_LOADED'));
     }
 
     public function testLoadCustomInitWithScriptThatThrowsException(): void
@@ -145,9 +147,9 @@ class ConfigLoaderTest extends TestCase
         $scriptPath = $this->tempDir . '/exception.php';
         file_put_contents($scriptPath, '<?php throw new Exception("test exception");');
 
-        // Expect unregister to be called, then register again due to exception
-        $initialLoader->expects($this->once())->method('unregister');
-        $initialLoader->expects($this->once())->method('register');
+        // No unregister/register expected - loader stays active
+        $initialLoader->expects($this->never())->method('unregister');
+        $initialLoader->expects($this->never())->method('register');
 
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('test exception');
