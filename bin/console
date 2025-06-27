@@ -21,9 +21,11 @@ declare(strict_types=1);
 
 use ConsoleApp\ClassmapCommandProvider;
 use ConsoleApp\ConsoleApp;
+use ConsoleApp\ConfigLoader;
+use Composer\Autoload\ClassLoader;
 
-$classLoader = null;
-
+// First, load the standard autoloader to get access to Composer classes
+$initialLoader = null;
 foreach ([
     $GLOBALS['_composer_autoload_path'] ?? 'vendor/autoload.php',
     __DIR__ . '/../../autoload.php',
@@ -34,10 +36,36 @@ foreach ([
         continue;
     }
 
-    $classLoader = require $file;
+    $initialLoader = require $file;
     break;
 }
 
+if (null === $initialLoader) {
+    fwrite(
+        STDERR,
+        'Please set up the project dependencies using Composer:' . PHP_EOL . PHP_EOL .
+        '    composer install' . PHP_EOL . PHP_EOL
+    );
+
+    exit(1);
+}
+
+$classLoader = $initialLoader;
+
+// Now we have access to Composer classes - check for custom init
+$configLoader = new ConfigLoader();
+$config = $configLoader->loadConfig();
+
+if (!empty($config['bootstrap'])) {
+    foreach ((array) $config['bootstrap'] as $initScript) {
+        $customLoader = $configLoader->loadCustomInit($initialLoader, $initScript);
+
+        if ($customLoader instanceof ClassLoader) {
+            $classLoader = $customLoader;
+            break;
+        }
+    }
+}
 
 if (null === $classLoader) {
     fwrite(
