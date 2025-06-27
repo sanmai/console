@@ -32,7 +32,7 @@ use const JSON_THROW_ON_ERROR;
 
 class ConfigLoader
 {
-    /** @var array{install_path: string} */
+    /** @var array{install_path: string, ...} */
     private readonly array $rootPackage;
 
     /**
@@ -45,12 +45,24 @@ class ConfigLoader
         $this->rootPackage = $rootPackage ?? InstalledVersions::getRootPackage();
     }
 
+    protected function readFile(string $path): string|false
+    {
+        $file = new SplFileObject($path, 'r');
+        return $file->fread($file->getSize());
+    }
+
     public function getBootstrapPath(): string
     {
         $path = $this->rootPackage['install_path'] . '/composer.json';
-        $file = new SplFileObject($path, 'r');
-        $json = json_decode($file->fread($file->getSize()), associative: true, flags: JSON_THROW_ON_ERROR);
-        return $json['extra']['console']['bootstrap'] ?? '';
+
+        $json = json_decode(
+            json: (string) $this->readFile($path),
+            associative: false,
+            flags: JSON_THROW_ON_ERROR,
+        );
+
+        // @phpstan-ignore-next-line
+        return $json->extra->console->bootstrap ?? '';
     }
 
     public function handleAutoloader(callable $callback): void

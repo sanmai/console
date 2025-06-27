@@ -22,6 +22,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\ConfigLoader;
 use Composer\Autoload\ClassLoader;
+use JsonException;
 
 #[CoversClass(ConfigLoader::class)]
 class ConfigLoaderTest extends TestCase
@@ -50,6 +51,23 @@ class ConfigLoaderTest extends TestCase
             '',
             $configLoader->getBootstrapPath()
         );
+    }
+
+    public function testGetBootstrapPathFileReadError(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $configLoader = $this->getMockBuilder(ConfigLoader::class)
+            ->setConstructorArgs([$classLoader, ['install_path' => '']])
+            ->onlyMethods(['readFile'])
+            ->getMock();
+
+        $configLoader->expects($this->once())
+            ->method('readFile')
+            ->willReturn(false);
+
+        $this->expectException(JsonException::class);
+        $configLoader->getBootstrapPath();
     }
 
     public function testAutoloaderCount(): void
