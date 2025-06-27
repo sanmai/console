@@ -22,11 +22,12 @@ use Composer\Autoload\ClassLoader;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\ClassmapCommandProvider\Helper;
+use Symfony\Component\Console\Command\Command;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use ReflectionClass;
 
 use function iterator_to_array;
-use function Pipeline\take;
 
 #[CoversClass(ClassmapCommandProvider::class)]
 class ClassmapCommandProviderTest extends TestCase
@@ -45,39 +46,47 @@ class ClassmapCommandProviderTest extends TestCase
         $this->assertCount(0, $provider);
     }
 
-    public function testItFindsCommand(): void
+    public function testItUsesHelper(): void
     {
+        $fullPath = (new ReflectionClass(HelloCommand::class))->getFileName();
+
         $loader = $this->createMock(ClassLoader::class);
 
         $loader->expects($this->once())
             ->method('getClassMap')
-            ->willReturn(self::classNamesToPaths(HelloCommand::class));
+            ->willReturn([HelloCommand::class => '../../src/HelloCommand.php']);
 
-        $provider = new ClassmapCommandProvider($loader);
+        $helper = $this->createMock(Helper::class);
 
-        $this->assertInstanceOf(HelloCommand::class, iterator_to_array($provider)[0]);
-    }
+        $helper->expects($this->once())
+            ->method('realpath')
+            ->with('../../src/HelloCommand.php')
+            ->willReturn($fullPath);
 
-    public function testItIgnoresNonCommandClasses(): void
-    {
-        $loader = $this->createMock(ClassLoader::class);
+        $helper->expects($this->once())
+            ->method('isNotVendoredDependency')
+            ->with($fullPath)
+            ->willReturn(true);
 
-        $loader->expects($this->once())
-            ->method('getClassMap')
-            ->willReturn(self::classNamesToPaths(
-                self::class,
-                ClassLoader::class,
-            ));
+        $helper->expects($this->once())
+            ->method('hasCommandInFilename')
+            ->with($fullPath)
+            ->willReturn(true);
 
-        $provider = new ClassmapCommandProvider($loader);
+        $helper->expects($this->once())
+            ->method('isCommandSubclass')
+            ->with(HelloCommand::class)
+            ->willReturn(true);
 
-        $this->assertCount(0, iterator_to_array($provider));
-    }
+        $mockCommand = $this->createMock(Command::class);
 
-    private static function classNamesToPaths(string ...$classNames): array
-    {
-        return take($classNames)
-            ->map(static fn(string $className) => yield $className => (new ReflectionClass($className))->getFileName())
-            ->toAssoc();
+        $helper->expects($this->once())
+            ->method('newCommand')
+            ->with(HelloCommand::class)
+            ->willReturn($mockCommand);
+
+        $provider = new ClassmapCommandProvider($loader, $helper);
+
+        $this->assertSame([$mockCommand], iterator_to_array($provider, false));
     }
 }

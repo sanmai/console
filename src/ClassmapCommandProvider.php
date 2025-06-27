@@ -21,17 +21,15 @@ declare(strict_types=1);
 namespace ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
+use ConsoleApp\ClassmapCommandProvider\Helper;
 use IteratorAggregate;
 use Later\Interfaces\Deferred;
 use Symfony\Component\Console\Command\Command;
 use Traversable;
 use Override;
 
-use function is_subclass_of;
 use function Later\later;
 use function Pipeline\take;
-use function str_contains;
-use function str_ends_with;
 
 /**
  * Command provider that discovers commands from Composer's classmap
@@ -44,8 +42,10 @@ class ClassmapCommandProvider implements IteratorAggregate
     /** @var Deferred<Traversable<Command>> */
     private readonly Deferred $commands;
 
-    public function __construct(private readonly ClassLoader $classLoader)
-    {
+    public function __construct(
+        private readonly ClassLoader $classLoader,
+        private readonly Helper $helper = new Helper(),
+    ) {
         $this->commands = later(fn() => yield $this->listCommands());
     }
 
@@ -56,39 +56,13 @@ class ClassmapCommandProvider implements IteratorAggregate
     {
         return take($this->classLoader->getClassMap())
             ->stream()
-            ->cast(realpath(...))
-            ->filter(self::isNotVendoredDependency(...))
-            ->filter(self::hasCommandInFilename(...))
+            ->cast($this->helper->realpath(...))
+            ->filter($this->helper->isNotVendoredDependency(...))
+            ->filter($this->helper->hasCommandInFilename(...))
             ->keys()
-            ->filter(self::isCommandSubclass(...))
-            ->cast(self::newCommand(...));
-    }
-
-    private static function isNotVendoredDependency(string $filename): bool
-    {
-        return !str_contains($filename, '/vendor/');
-    }
-
-    private static function hasCommandInFilename(string $filename): bool
-    {
-        return str_ends_with($filename, 'Command.php');
-    }
-
-    /**
-     * @param class-string $class
-     */
-    private static function isCommandSubclass(string $class): bool
-    {
-        return is_subclass_of($class, Command::class);
-    }
-
-    /**
-     * @param class-string<Command> $class
-     */
-    private static function newCommand(string $class): Command
-    {
-        /** @psalm-suppress UnsafeInstantiation */
-        return new $class();
+            ->filter($this->helper->isCommandSubclass(...))
+            ->cast($this->helper->newCommand(...))
+            ->filter();
     }
 
     #[Override]
