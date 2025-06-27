@@ -4,6 +4,14 @@
     "require": {
         "sanmai/console": "*"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "TestApp\\": "src/"

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2025 Alexey Kopytko <alexey@kopytko.com>
  *
@@ -33,9 +34,6 @@ date_default_timezone_set('UTC');
 // Define a constant that proves the bootstrap was loaded
 define('BOOTSTRAP_LOADED', true);
 define('BOOTSTRAP_TIME', date('Y-m-d H:i:s'));
-
-// Log that bootstrap was executed
-file_put_contents(__DIR__ . '/bootstrap.log', "Bootstrap executed at " . BOOTSTRAP_TIME . "\n");
 
 // The Composer autoloader is already loaded
 // Bootstrap scripts don't need to return anything (like PHPUnit)
