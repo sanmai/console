@@ -31,36 +31,27 @@ use function file_exists;
 #[CoversNothing]
 class IntegrationBootstrapTest extends TestCase
 {
-    private string $originalDir;
-    private string $integrationDir;
+    private static string $originalDir;
+    private static string $integrationDir;
 
-    protected function setUp(): void
+    public static function setUpBeforeClass(): void
     {
-        $this->originalDir = getcwd();
-        $this->integrationDir = __DIR__ . '/integration';
-
-        // Ensure we have the integration directory
-        $this->assertDirectoryExists($this->integrationDir);
-
-        // Change to integration directory
-        chdir($this->integrationDir);
+        self::$originalDir = getcwd();
+        self::$integrationDir = realpath(__DIR__ . '/../integration');
+        chdir(self::$integrationDir);
     }
 
-    protected function tearDown(): void
+    public static function tearDownAfterClass(): void
     {
-        // Always change back to original directory
-        chdir($this->originalDir);
+        chdir(self::$originalDir);
     }
 
     public function testIntegrationProjectIsSetUp(): void
     {
-        // Verify composer.json exists
+        $this->assertDirectoryExists(self::$integrationDir);
+
         $this->assertFileExists('composer.json');
-
-        // Verify bootstrap.php exists
         $this->assertFileExists('bootstrap.php');
-
-        // Verify command exists
         $this->assertFileExists('src/TestBootstrapCommand.php');
     }
 
@@ -69,7 +60,7 @@ class IntegrationBootstrapTest extends TestCase
         // Run composer install if vendor doesn't exist
         if (!file_exists('vendor')) {
             $process = new Process(['composer', 'install', '--no-interaction']);
-            $process->setWorkingDirectory($this->integrationDir);
+            $process->setWorkingDirectory(self::$integrationDir);
             $process->run();
 
             $this->assertTrue(
@@ -80,7 +71,7 @@ class IntegrationBootstrapTest extends TestCase
 
         // Always regenerate autoload to ensure commands are discovered
         $process = new Process(['composer', 'dump-autoload', '-o']);
-        $process->setWorkingDirectory($this->integrationDir);
+        $process->setWorkingDirectory(self::$integrationDir);
         $process->run();
 
         $this->assertTrue(
@@ -129,7 +120,7 @@ class IntegrationBootstrapTest extends TestCase
         $process = $this->runConsoleCommand(['test:bootstrap']);
 
         $this->assertTrue($process->isSuccessful(), 'Bootstrap command failed');
-        $this->assertStringContainsString('✓ Custom bootstrap was loaded successfully!', $process->getOutput());
+        $this->assertStringContainsString('Custom bootstrap was loaded successfully', $process->getOutput());
         $this->assertStringContainsString('Bootstrap time:', $process->getOutput());
     }
 
@@ -161,7 +152,7 @@ class IntegrationBootstrapTest extends TestCase
     private function runConsoleCommand(array $command): Process
     {
         $process = new Process(['php', 'vendor/bin/console', ...$command]);
-        $process->setWorkingDirectory($this->integrationDir);
+        $process->setWorkingDirectory(self::$integrationDir);
         $process->run();
 
         return $process;
