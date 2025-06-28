@@ -16,8 +16,9 @@
  * limitations under the License.
  */
 
-namespace Tests\ConsoleApp\ClassmapCommandProvider;
+namespace Tests\ConsoleApp\CommandProviderHelper;
 
+use ConsoleApp\CommandProviderDiscovery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\CommandProviderHelper\Helper;
@@ -77,6 +78,12 @@ class HelperTest extends TestCase
         );
 
         $this->assertNull($this->helper->newCommand(AbstractCommand::class));
+    }
+
+    public function testItChecksOurNamespace(): void
+    {
+        $this->assertTrue($this->helper->isNotOurNamespace(TestCommandProvider::class));
+        $this->assertFalse($this->helper->isNotOurNamespace(CommandProviderDiscovery::class));
     }
 
     public function testItChecksCommandProviderSubclass(): void
