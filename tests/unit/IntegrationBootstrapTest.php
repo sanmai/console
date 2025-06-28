@@ -167,7 +167,7 @@ class IntegrationBootstrapTest extends TestCase
     }
 
     /**
-     * @param list<string> $command
+     * @param string ...$command
      */
     private function runConsoleCommand(string ...$command): Process
     {

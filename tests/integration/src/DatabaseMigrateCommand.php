@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2025 Alexey Kopytko <alexey@kopytko.com>
  *
@@ -23,6 +24,8 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
+use function sprintf;
 
 #[AsCommand(
     name: 'db:migrate',
