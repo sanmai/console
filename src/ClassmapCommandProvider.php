@@ -49,8 +49,8 @@ final class ClassmapCommandProvider implements IteratorAggregate, CommandProvide
             ->cast($this->helper->realpath(...))
             ->filter($this->helper->isNotVendoredDependency(...))
             ->keys()
-            ->filter($this->helper->isCommandSubclass(...))
             ->filter($this->helper->hasCommandSuffix(...))
+            ->filter($this->helper->isCommandSubclass(...))
             ->cast($this->helper->newCommand(...))
             ->filter();
     }
