@@ -21,12 +21,13 @@ declare(strict_types=1);
 namespace Tests\ConsoleApp;
 
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\TestDox;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
 use function chdir;
 use function getcwd;
-use function file_exists;
 use function realpath;
 
 #[CoversNothing]
@@ -58,17 +59,15 @@ class IntegrationBootstrapTest extends TestCase
 
     public function testComposerInstallWorks(): void
     {
-        // Run composer install if vendor doesn't exist
-        if (!file_exists('vendor')) {
-            $process = new Process(['composer', 'install', '--no-interaction']);
-            $process->setWorkingDirectory(self::$integrationDir);
-            $process->run();
+        // Install dependencies using Composer
+        $process = new Process(['composer', 'install', '--no-interaction']);
+        $process->setWorkingDirectory(self::$integrationDir);
+        $process->run();
 
-            $this->assertTrue(
-                $process->isSuccessful(),
-                'Composer install failed: ' . $process->getErrorOutput()
-            );
-        }
+        $this->assertTrue(
+            $process->isSuccessful(),
+            'Composer install failed: ' . $process->getErrorOutput()
+        );
 
         // Always regenerate autoload to ensure commands are discovered
         $process = new Process(['composer', 'dump-autoload', '-o']);
@@ -86,70 +85,91 @@ class IntegrationBootstrapTest extends TestCase
         $this->assertFileExists('vendor/bin/console');
     }
 
+    #[Depends('testComposerInstallWorks')]
     public function testConsoleListCommand(): void
     {
-        // Ensure composer dependencies are installed
-        $this->testComposerInstallWorks();
-
-        // Run console list command
-        $process = $this->runConsoleCommand(['list']);
+        $process = $this->runConsoleCommand('list');
 
         $this->assertTrue($process->isSuccessful(), 'Console list command failed');
         $this->assertStringContainsString('Console App', $process->getOutput());
         $this->assertStringContainsString('Available commands:', $process->getOutput());
     }
 
+    #[Depends('testComposerInstallWorks')]
     public function testBootstrapCommandAppearsInList(): void
     {
-        // Ensure composer dependencies are installed
-        $this->testComposerInstallWorks();
-
-        // Run console list command
-        $process = $this->runConsoleCommand(['list']);
+        $process = $this->runConsoleCommand('list');
 
         $this->assertTrue($process->isSuccessful());
         $this->assertStringContainsString('test:bootstrap', $process->getOutput());
         $this->assertStringContainsString('Test command that proves the custom bootstrap was loaded', $process->getOutput());
     }
 
+    #[Depends('testComposerInstallWorks')]
     public function testBootstrapCommandExecutesSuccessfully(): void
     {
-        // Ensure composer dependencies are installed
-        $this->testComposerInstallWorks();
-
-        // Run the test:bootstrap command
-        $process = $this->runConsoleCommand(['test:bootstrap']);
+        $process = $this->runConsoleCommand('test:bootstrap');
 
         $this->assertTrue($process->isSuccessful(), 'Bootstrap command failed');
         $this->assertStringContainsString('Custom bootstrap was loaded successfully', $process->getOutput());
     }
 
+    #[Depends('testComposerInstallWorks')]
+    #[TestDox('Test that the bootstrap script is loaded')]
     public function testBootstrapScriptIsLoaded(): void
     {
-        // Ensure composer dependencies are installed
-        $this->testComposerInstallWorks();
-
         // The test:bootstrap command already verifies that the bootstrap script was loaded
         // by checking for the BOOTSTRAP_LOADED constant. If the bootstrap wasn't loaded,
         // the command would fail and output an error message.
-        $process = $this->runConsoleCommand(['test:bootstrap']);
+        $process = $this->runConsoleCommand('test:bootstrap');
 
         $this->assertTrue(
             $process->isSuccessful(),
             'Bootstrap was not loaded. Output: ' . $process->getOutput()
         );
 
-        // Verify the command confirms bootstrap was loaded
         $this->assertStringContainsString(
             'Custom bootstrap was loaded successfully!',
             $process->getOutput()
         );
     }
 
+    #[Depends('testComposerInstallWorks')]
+    #[TestDox('Test that db:migrate and db:seed commands are available')]
+    public function testDatabaseCommandsFromProvider(): void
+    {
+        $process = $this->runConsoleCommand('list');
+
+        $this->assertTrue($process->isSuccessful());
+        $output = $process->getOutput();
+        $this->assertStringContainsString('db:migrate', $output, 'db:migrate command not found');
+        $this->assertStringContainsString('db:seed', $output, 'db:seed command not found');
+        $this->assertStringContainsString('Run database migrations', $output);
+        $this->assertStringContainsString('Seed the database', $output);
+    }
+
+    #[Depends('testComposerInstallWorks')]
+    public function testDatabaseMigrateCommand(): void
+    {
+        $process = $this->runConsoleCommand('db:migrate');
+
+        $this->assertTrue($process->isSuccessful());
+        $this->assertStringContainsString('Running migrations on localhost/test', $process->getOutput());
+    }
+
+    #[Depends('testComposerInstallWorks')]
+    public function testDatabaseSeedCommand(): void
+    {
+        $process = $this->runConsoleCommand('db:seed');
+
+        $this->assertTrue($process->isSuccessful());
+        $this->assertStringContainsString('Seeding database test with test data', $process->getOutput());
+    }
+
     /**
      * @param list<string> $command
      */
-    private function runConsoleCommand(array $command): Process
+    private function runConsoleCommand(string ...$command): Process
     {
         $process = new Process(['php', 'vendor/bin/console', ...$command]);
         $process->setWorkingDirectory(self::$integrationDir);
