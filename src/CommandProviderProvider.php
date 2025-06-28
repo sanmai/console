@@ -32,6 +32,7 @@ use function Pipeline\take;
  */
 final class CommandProviderProvider implements IteratorAggregate, CommandProviderInterface
 {
+    /** @var array<CommandProviderInterface> */
     private readonly array $providers;
 
     public function __construct(
