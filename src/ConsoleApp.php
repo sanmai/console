@@ -31,10 +31,13 @@ final class ConsoleApp extends Application
 {
     public const VERSION_INFO = '$Format:%h%d by %an +%ae$';
 
+    /**
+     * @param array<CommandProviderInterface> $commandProviders
+     */
     public function __construct(
-        private readonly ClassmapCommandProvider $commandProvider,
-        private readonly CommandProviderDiscovery $providerDiscovery,
-        private readonly VersionReader $versionReader = new PlaceholderVersionReader(self::VERSION_INFO)
+        private readonly CommandProviderInterface $commandProvider,
+        private readonly CommandProviderInterface $providerDiscovery,
+        private readonly VersionReader $versionReader = new PlaceholderVersionReader(self::VERSION_INFO),
     ) {
         parent::__construct('Console App');
     }
@@ -49,9 +52,10 @@ final class ConsoleApp extends Application
     protected function getDefaultCommands(): array
     {
         // @phpstan-ignore-next-line
-        return take(parent::getDefaultCommands())
-            ->append($this->commandProvider)
-            ->append($this->providerDiscovery)
-            ->toList();
+        return take(
+            parent::getDefaultCommands(),
+            $this->commandProvider,
+            $this->providerDiscovery,
+        )->toList();
     }
 }
