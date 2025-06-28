@@ -55,12 +55,12 @@ final class ClassmapCommandProviderTest extends TestCase
             ->willReturn(true);
 
         $helper->expects($this->once())
-            ->method('hasCommandInFilename')
-            ->with($fullPath)
+            ->method('isCommandSubclass')
+            ->with(HelloCommand::class)
             ->willReturn(true);
 
         $helper->expects($this->once())
-            ->method('isCommandSubclass')
+            ->method('hasCommandSuffix')
             ->with(HelloCommand::class)
             ->willReturn(true);
 

@@ -67,11 +67,10 @@ That's it! No configuration files, no manual command registration.
 This library provides a ready-made `vendor/bin/console` executable that automatically discovers all Symfony Console commands in your project by:
 
 1. Scanning Composer's optimized classmap
-2. Finding classes that end with `Command.php`
-3. Loading those that extend `Symfony\Component\Console\Command\Command`
-4. Filtering out vendored files
-5. Instantiating each command (commands that throw exceptions or errors are skipped)
-6. Discovering `CommandProviderInterface` implementations for commands with dependencies
+2. Finding classes that extend `Symfony\Component\Console\Command\Command` and end with `Command`
+3. Filtering out vendored files
+4. Instantiating each command (commands that throw exceptions or errors are skipped)
+5. Discovering `CommandProviderInterface` implementations (classes ending with `CommandProvider`) for commands with dependencies
 
 ## The Problem It Solves
 
@@ -118,14 +117,14 @@ For commands that require constructor dependencies, implement the `CommandProvid
 
 ```php
 <?php
-// src/MyCommandProvider.php
+// src/DatabaseCommandProvider.php
 namespace App;
 
 use ConsoleApp\CommandProviderInterface;
 use IteratorAggregate;
 use Symfony\Component\Console\Command\Command;
 
-class MyCommandProvider implements CommandProviderInterface, IteratorAggregate
+class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggregate
 {
     // Provider must have a no-required-argument constructor
     public function __construct(int $optional = 0) {}
@@ -149,10 +148,11 @@ class MyCommandProvider implements CommandProviderInterface, IteratorAggregate
 
 Commands not showing up?
 - Run `composer dump-autoload --optimize` (add `--dev` if your commands are in autoload-dev)
-- Verify your command files end with `Command.php`
+- Verify your command class names end with `Command` (e.g., `HelloCommand`, `MigrateCommand`)
 - Check that commands extend `Symfony\Component\Console\Command\Command`
 - Commands in `vendor/` are ignored by default
 - Commands with required constructor arguments are filtered out
+- Command providers must have class names ending with `CommandProvider`
 
 ## Testing
 
