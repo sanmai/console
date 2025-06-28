@@ -30,11 +30,11 @@ use Override;
 use function Pipeline\take;
 
 /**
- * Command provider that discovers commands from Composer's classmap
+ * Discovers and provides commands from CommandProviderInterface implementations
  *
  * @implements IteratorAggregate<Command>
  */
-final class ClassmapCommandProvider implements IteratorAggregate, CommandProviderInterface
+final class CommandProviderDiscovery implements IteratorAggregate, CommandProviderInterface
 {
     public function __construct(
         private readonly ClassLoader $classLoader,
@@ -48,10 +48,10 @@ final class ClassmapCommandProvider implements IteratorAggregate, CommandProvide
             ->stream()
             ->cast($this->helper->realpath(...))
             ->filter($this->helper->isNotVendoredDependency(...))
-            ->filter($this->helper->hasCommandInFilename(...))
             ->keys()
-            ->filter($this->helper->isCommandSubclass(...))
-            ->cast($this->helper->newCommand(...))
-            ->filter();
+            ->filter($this->helper->isNotOurNamespace(...))
+            ->filter($this->helper->isCommandProviderSubclass(...))
+            ->cast($this->helper->newCommandProvider(...))
+            ->unpack();
     }
 }

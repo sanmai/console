@@ -36,7 +36,7 @@ COMPOSER=$(PHP) $(shell which composer)
 
 # Infection
 INFECTION=vendor/bin/infection
-MIN_MSI=90
+MIN_MSI=100
 MIN_COVERED_MSI=100
 INFECTION_ARGS=--min-msi=$(MIN_MSI) --min-covered-msi=$(MIN_COVERED_MSI) --threads=$(JOBS) --coverage=build/logs --log-verbosity=default --show-mutations --no-interaction
 
@@ -74,7 +74,7 @@ ci-cs: prerequisites
 ##############################################################
 
 .PHONY: test
-test: analyze phpunit infection composer-validate yamllint
+test: phpunit analyze infection composer-validate yamllint
 
 .PHONY: composer-validate
 composer-validate: test-prerequisites

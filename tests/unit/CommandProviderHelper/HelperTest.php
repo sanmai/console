@@ -16,14 +16,17 @@
  * limitations under the License.
  */
 
-namespace Tests\ConsoleApp\ClassmapCommandProvider;
+namespace Tests\ConsoleApp\CommandProviderHelper;
 
+use ConsoleApp\CommandProviderDiscovery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\ClassmapCommandProvider\Helper;
+use ConsoleApp\CommandProviderHelper\Helper;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
+use Tests\ConsoleApp\Fixtures\TestCommandProvider;
 
+use function iterator_to_array;
 use function realpath;
 
 #[CoversClass(Helper::class)]
@@ -76,4 +79,29 @@ class HelperTest extends TestCase
 
         $this->assertNull($this->helper->newCommand(AbstractCommand::class));
     }
+
+    public function testItChecksOurNamespace(): void
+    {
+        $this->assertTrue($this->helper->isNotOurNamespace(TestCommandProvider::class));
+        $this->assertTrue($this->helper->isNotOurNamespace('ConsoleApp'));
+        $this->assertFalse($this->helper->isNotOurNamespace(CommandProviderDiscovery::class));
+    }
+
+    public function testItChecksCommandProviderSubclass(): void
+    {
+        $this->assertTrue($this->helper->isCommandProviderSubclass(TestCommandProvider::class));
+        $this->assertFalse($this->helper->isCommandProviderSubclass(HelloCommand::class));
+        $this->assertFalse($this->helper->isCommandProviderSubclass(Helper::class));
+    }
+
+    public function testNewCommandProvider(): void
+    {
+        $provider = $this->helper->newCommandProvider(TestCommandProvider::class);
+        $this->assertInstanceOf(TestCommandProvider::class, $provider);
+
+        $commands = iterator_to_array($provider);
+        $this->assertCount(2, $commands);
+        $this->assertInstanceOf(HelloCommand::class, $commands[0]);
+    }
+
 }

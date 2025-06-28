@@ -71,6 +71,7 @@ This library provides a ready-made `vendor/bin/console` executable that automati
 3. Loading those that extend `Symfony\Component\Console\Command\Command`
 4. Filtering out vendored files
 5. Instantiating each command (commands that throw exceptions or errors are skipped)
+6. Discovering `CommandProviderInterface` implementations for commands with dependencies
 
 ## The Problem It Solves
 
@@ -111,6 +112,39 @@ define('APP_ENV', $_ENV['APP_ENV'] ?? 'production');
 // Safe to include vendor/autoload.php if needed
 ```
 
+## Commands with Dependencies
+
+For commands that require constructor dependencies, implement the `CommandProviderInterface`:
+
+```php
+<?php
+// src/MyCommandProvider.php
+namespace App;
+
+use ConsoleApp\CommandProviderInterface;
+use IteratorAggregate;
+use Symfony\Component\Console\Command\Command;
+
+class MyCommandProvider implements CommandProviderInterface, IteratorAggregate
+{
+    // Provider must have a no-required-argument constructor
+    public function __construct(int $optional = 0) {}
+
+    public function getIterator(): \Traversable
+    {
+        // Build your services/dependencies
+        $database = new DatabaseConnection();
+        $cache = new CacheService();
+
+        // Yield commands with their dependencies
+        yield new DatabaseMigrationCommand($database);
+        yield new CacheClearCommand($cache);
+    }
+}
+```
+
+`CommandProviderInterface` implementations must have no required arguments in their constructor as they are instantiated automatically.
+
 ## Troubleshooting
 
 Commands not showing up?
@@ -119,9 +153,6 @@ Commands not showing up?
 - Check that commands extend `Symfony\Component\Console\Command\Command`
 - Commands in `vendor/` are ignored by default
 - Commands with required constructor arguments are filtered out
-
-Need commands with constructor dependencies?
-Make constructor parameters optional with default values.
 
 ## Testing
 

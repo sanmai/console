@@ -22,6 +22,7 @@ namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\CommandProviderInterface;
 use ConsoleApp\ConsoleApp;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
@@ -76,7 +77,7 @@ final class ConsoleAppTest extends TestCase
 
     public function testVersionDefault(): void
     {
-        $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class));
+        $app = new ConsoleApp($this->createMock(CommandProviderInterface::class));
         $version = $app->getVersion();
 
         $this->assertSame('UNKNOWN', $version);
@@ -89,7 +90,7 @@ final class ConsoleAppTest extends TestCase
             ->method('getVersionString')
             ->willReturn('1.2.3');
 
-        $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class), $versionReader);
+        $app = new ConsoleApp($this->createMock(CommandProviderInterface::class), $versionReader);
         $version = $app->getVersion();
 
         $this->assertSame('1.2.3', $version);

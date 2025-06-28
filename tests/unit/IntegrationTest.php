@@ -19,9 +19,9 @@
 namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
+use ConsoleApp\ClassmapCommandProvider;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\ClassmapCommandProvider;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;
@@ -33,7 +33,7 @@ use function iterator_to_array;
 use function Pipeline\take;
 
 #[CoversNothing]
-class IntegrationTest extends TestCase
+final class IntegrationTest extends TestCase
 {
     public function testItFindsCommand(): void
     {

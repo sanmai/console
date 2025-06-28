@@ -19,18 +19,19 @@
 namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
-use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\CommandProviderHelper\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\CommandProviderHelper\Helper;
-use Symfony\Component\Console\Command\Command;
-use Tests\ConsoleApp\Fixtures\HelloCommand;
+use ConsoleApp\CommandProviderDiscovery;
 use ReflectionClass;
+use Symfony\Component\Console\Command\Command;
+use Tests\ConsoleApp\Fixtures\TestCommandProvider;
+use Tests\ConsoleApp\Fixtures\HelloCommand;
 
 use function iterator_to_array;
 
-#[CoversClass(ClassmapCommandProvider::class)]
-final class ClassmapCommandProviderTest extends TestCase
+#[CoversClass(CommandProviderDiscovery::class)]
+final class CommandProviderDiscoveryTest extends TestCase
 {
     public function testItUsesHelper(): void
     {
@@ -40,13 +41,13 @@ final class ClassmapCommandProviderTest extends TestCase
 
         $loader->expects($this->once())
             ->method('getClassMap')
-            ->willReturn([HelloCommand::class => '../../src/HelloCommand.php']);
+            ->willReturn([TestCommandProvider::class => '../../src/TestCommandProvider.php']);
 
         $helper = $this->createMock(Helper::class);
 
         $helper->expects($this->once())
             ->method('realpath')
-            ->with('../../src/HelloCommand.php')
+            ->with('../../src/TestCommandProvider.php')
             ->willReturn($fullPath);
 
         $helper->expects($this->once())
@@ -55,23 +56,23 @@ final class ClassmapCommandProviderTest extends TestCase
             ->willReturn(true);
 
         $helper->expects($this->once())
-            ->method('hasCommandInFilename')
-            ->with($fullPath)
+            ->method('isNotOurNamespace')
+            ->with(TestCommandProvider::class)
             ->willReturn(true);
 
         $helper->expects($this->once())
-            ->method('isCommandSubclass')
-            ->with(HelloCommand::class)
+            ->method('isCommandProviderSubclass')
+            ->with(TestCommandProvider::class)
             ->willReturn(true);
 
         $mockCommand = $this->createMock(Command::class);
 
         $helper->expects($this->once())
-            ->method('newCommand')
-            ->with(HelloCommand::class)
-            ->willReturn($mockCommand);
+            ->method('newCommandProvider')
+            ->with(TestCommandProvider::class)
+            ->willReturn(new TestCommandProvider($mockCommand));
 
-        $provider = new ClassmapCommandProvider($loader, $helper);
+        $provider = new CommandProviderDiscovery($loader, $helper);
 
         $this->assertSame([$mockCommand], iterator_to_array($provider, false));
     }

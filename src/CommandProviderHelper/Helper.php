@@ -16,18 +16,30 @@
  * limitations under the License.
  */
 
-namespace ConsoleApp\ClassmapCommandProvider;
+namespace ConsoleApp\CommandProviderHelper;
 
+use ConsoleApp\CommandProviderInterface;
 use Symfony\Component\Console\Command\Command;
 use Throwable;
+use Traversable;
 
 use function is_subclass_of;
 use function realpath;
 use function str_contains;
 use function str_ends_with;
+use function str_starts_with;
+use function strtok;
 
-class Helper
+final class Helper
 {
+    private readonly string $namespacePrefix;
+
+    public function __construct()
+    {
+        /** @psalm-suppress PossiblyFalseOperand */
+        $this->namespacePrefix = strtok(self::class, '\\') . '\\';
+    }
+
     public function realpath(string $filename): string
     {
         $realpath = realpath($filename);
@@ -59,15 +71,37 @@ class Helper
 
     /**
      * @param class-string<Command> $class
+     * @psalm-suppress UnsafeInstantiation
      */
     public function newCommand(string $class): ?Command
     {
         try {
-            /** @psalm-suppress UnsafeInstantiation */
             return new $class();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             return null;
         }
     }
 
+    public function isNotOurNamespace(string $class): bool
+    {
+        return !str_starts_with($class, $this->namespacePrefix);
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public function isCommandProviderSubclass(string $class): bool
+    {
+        return is_subclass_of($class, CommandProviderInterface::class);
+    }
+
+    /**
+     * @param class-string<CommandProviderInterface> $class
+     * @return Traversable<Command>
+     * @psalm-suppress UnsafeInstantiation
+     */
+    public function newCommandProvider(string $class): Traversable
+    {
+        return new $class();
+    }
 }

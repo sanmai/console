@@ -32,8 +32,8 @@ final class ConsoleApp extends Application
     public const VERSION_INFO = '$Format:%h%d by %an +%ae$';
 
     public function __construct(
-        private readonly ClassmapCommandProvider $commandProvider,
-        private readonly VersionReader $versionReader = new PlaceholderVersionReader(self::VERSION_INFO)
+        private readonly CommandProviderInterface $commandProvider,
+        private readonly VersionReader $versionReader = new PlaceholderVersionReader(self::VERSION_INFO),
     ) {
         parent::__construct('Console App');
     }

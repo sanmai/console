@@ -20,8 +20,6 @@ declare(strict_types=1);
 
 namespace ConsoleApp;
 
-use Composer\Autoload\ClassLoader;
-use ConsoleApp\CommandProviderHelper\Helper;
 use IteratorAggregate;
 use Symfony\Component\Console\Command\Command;
 use Traversable;
@@ -30,28 +28,22 @@ use Override;
 use function Pipeline\take;
 
 /**
- * Command provider that discovers commands from Composer's classmap
- *
  * @implements IteratorAggregate<Command>
  */
-final class ClassmapCommandProvider implements IteratorAggregate, CommandProviderInterface
+final class CommandProviderProvider implements IteratorAggregate, CommandProviderInterface
 {
+    /** @var array<CommandProviderInterface> */
+    private readonly array $providers;
+
     public function __construct(
-        private readonly ClassLoader $classLoader,
-        private readonly Helper $helper = new Helper(),
-    ) {}
+        CommandProviderInterface ...$providers,
+    ) {
+        $this->providers = $providers;
+    }
 
     #[Override]
     public function getIterator(): Traversable
     {
-        return take($this->classLoader->getClassMap())
-            ->stream()
-            ->cast($this->helper->realpath(...))
-            ->filter($this->helper->isNotVendoredDependency(...))
-            ->filter($this->helper->hasCommandInFilename(...))
-            ->keys()
-            ->filter($this->helper->isCommandSubclass(...))
-            ->cast($this->helper->newCommand(...))
-            ->filter();
+        return take(...$this->providers);
     }
 }

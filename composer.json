@@ -11,13 +11,13 @@
     ],
     "require": {
         "php": ">=8.2",
-        "sanmai/later": "^0.1.7",
         "sanmai/pipeline": "^6.17",
         "sanmai/version-info": "^0.2",
         "symfony/console": "^6.0 || ^7.0"
     },
     "require-dev": {
         "composer/composer": "^2.2",
+        "dg/bypass-finals": "^1.9",
         "ergebnis/composer-normalize": "^2.8",
         "friendsofphp/php-cs-fixer": "^3.17",
         "infection/infection": ">=0.29",
@@ -27,7 +27,7 @@
         "phpstan/phpstan": "^2",
         "phpunit/phpunit": ">=9.4 <12",
         "symfony/process": "^7.3",
-        "vimeo/psalm": ">=2"
+        "vimeo/psalm": "^6.12"
     },
     "autoload": {
         "psr-4": {
