@@ -53,9 +53,7 @@ final class ConsoleAppTest extends TestCase
     #[Depends('testClassMapIncludesFixtures')]
     public function testIt(): void
     {
-        $app = new ConsoleApp(
-            new ClassmapCommandProvider(self::$autoloader),
-        );
+        $app = new ConsoleApp(new ClassmapCommandProvider(self::$autoloader));
 
         $this->assertTrue(
             $app->has('hello'),
@@ -66,9 +64,7 @@ final class ConsoleAppTest extends TestCase
     #[Depends('testClassMapIncludesFixtures')]
     public function testListInterfacesCommandExecution(): void
     {
-        $application = new ConsoleApp(
-            new ClassmapCommandProvider(self::$autoloader)
-        );
+        $application = new ConsoleApp(new ClassmapCommandProvider(self::$autoloader));
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
@@ -81,9 +77,7 @@ final class ConsoleAppTest extends TestCase
 
     public function testVersionDefault(): void
     {
-        $app = new ConsoleApp(
-            $this->createMock(CommandProviderInterface::class),
-        );
+        $app = new ConsoleApp($this->createMock(CommandProviderInterface::class));
         $version = $app->getVersion();
 
         $this->assertSame('UNKNOWN', $version);
@@ -96,10 +90,7 @@ final class ConsoleAppTest extends TestCase
             ->method('getVersionString')
             ->willReturn('1.2.3');
 
-        $app = new ConsoleApp(
-            $this->createMock(CommandProviderInterface::class),
-            $versionReader
-        );
+        $app = new ConsoleApp($this->createMock(CommandProviderInterface::class), $versionReader);
         $version = $app->getVersion();
 
         $this->assertSame('1.2.3', $version);
