@@ -61,12 +61,12 @@ final class CommandProviderDiscoveryTest extends TestCase
             ->willReturn(true);
 
         $helper->expects($this->once())
-            ->method('isCommandProviderSubclass')
+            ->method('hasCommandProviderSuffix')
             ->with(TestCommandProvider::class)
             ->willReturn(true);
 
         $helper->expects($this->once())
-            ->method('hasCommandProviderSuffix')
+            ->method('isCommandProviderSubclass')
             ->with(TestCommandProvider::class)
             ->willReturn(true);
 
