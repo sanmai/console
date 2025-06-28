@@ -28,7 +28,7 @@ use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;
 use function iterator_to_array;
 
 #[CoversClass(CommandProviderProvider::class)]
-class CommandProviderProviderTest extends TestCase
+final class CommandProviderProviderTest extends TestCase
 {
     public function testItProvides(): void
     {

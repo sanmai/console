@@ -25,7 +25,7 @@ use Symfony\Component\Process\Process;
 use function realpath;
 
 #[CoversNothing]
-class ConsoleIntegrationTest extends TestCase
+final class ConsoleIntegrationTest extends TestCase
 {
     private static string $consolePath;
 

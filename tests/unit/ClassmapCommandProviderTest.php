@@ -30,7 +30,7 @@ use ReflectionClass;
 use function iterator_to_array;
 
 #[CoversClass(ClassmapCommandProvider::class)]
-class ClassmapCommandProviderTest extends TestCase
+final class ClassmapCommandProviderTest extends TestCase
 {
     public function testItUsesHelper(): void
     {

@@ -33,7 +33,7 @@ use function iterator_to_array;
 use function Pipeline\take;
 
 #[CoversNothing]
-class IntegrationTest extends TestCase
+final class IntegrationTest extends TestCase
 {
     public function testItFindsCommand(): void
     {

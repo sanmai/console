@@ -31,7 +31,7 @@ use function sprintf;
     name: 'db:migrate',
     description: 'Run database migrations'
 )]
-class DatabaseMigrateCommand extends Command
+final class DatabaseMigrateCommand extends Command
 {
     public function __construct(
         private readonly array $dbConfig

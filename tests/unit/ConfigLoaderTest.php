@@ -25,7 +25,7 @@ use Composer\Autoload\ClassLoader;
 use JsonException;
 
 #[CoversClass(ConfigLoader::class)]
-class ConfigLoaderTest extends TestCase
+final class ConfigLoaderTest extends TestCase
 {
     public function testGetBootstrapPath(): void
     {

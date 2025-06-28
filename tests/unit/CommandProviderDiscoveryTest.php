@@ -31,7 +31,7 @@ use Tests\ConsoleApp\Fixtures\HelloCommand;
 use function iterator_to_array;
 
 #[CoversClass(CommandProviderDiscovery::class)]
-class CommandProviderDiscoveryTest extends TestCase
+final class CommandProviderDiscoveryTest extends TestCase
 {
     public function testItUsesHelper(): void
     {

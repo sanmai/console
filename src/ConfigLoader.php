@@ -30,7 +30,7 @@ use function count;
 
 use const JSON_THROW_ON_ERROR;
 
-class ConfigLoader
+final class ConfigLoader
 {
     /** @var array{install_path: string, ...} */
     private readonly array $rootPackage;

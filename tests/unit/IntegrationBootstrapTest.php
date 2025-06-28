@@ -31,7 +31,7 @@ use function getcwd;
 use function realpath;
 
 #[CoversNothing]
-class IntegrationBootstrapTest extends TestCase
+final class IntegrationBootstrapTest extends TestCase
 {
     private static string $originalDir;
     private static string $integrationDir;

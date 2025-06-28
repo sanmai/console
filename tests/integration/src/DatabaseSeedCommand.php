@@ -31,7 +31,7 @@ use function sprintf;
     name: 'db:seed',
     description: 'Seed the database'
 )]
-class DatabaseSeedCommand extends Command
+final class DatabaseSeedCommand extends Command
 {
     public function __construct(
         private readonly array $dbConfig

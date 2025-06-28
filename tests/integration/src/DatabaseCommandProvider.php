@@ -24,7 +24,7 @@ use ConsoleApp\CommandProviderInterface;
 use IteratorAggregate;
 use Traversable;
 
-class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggregate
+final class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggregate
 {
     public function getIterator(): Traversable
     {
