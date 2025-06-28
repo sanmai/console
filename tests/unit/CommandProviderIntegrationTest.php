@@ -22,7 +22,6 @@ use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\CommandProviderHelper;
 use ConsoleApp\CommandProviderDiscovery;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;

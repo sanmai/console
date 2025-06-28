@@ -19,9 +19,9 @@
 namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
+use ConsoleApp\ClassmapCommandProvider;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\CommandProviderHelper;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;

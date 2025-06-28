@@ -27,9 +27,18 @@ use function is_subclass_of;
 use function realpath;
 use function str_contains;
 use function str_ends_with;
+use function str_starts_with;
+use function strtok;
 
 final class Helper
 {
+    private readonly string $namespacePrefix;
+
+    public function __construct()
+    {
+        $this->namespacePrefix = strtok(self::class, '\\') . '\\';
+    }
+
     public function realpath(string $filename): string
     {
         $realpath = realpath($filename);
@@ -72,6 +81,12 @@ final class Helper
         }
     }
 
+    public function isNotOurNamespace(string $class): bool
+    {
+        return !str_starts_with($class, $this->namespacePrefix);
+
+    }
+
     /**
      * @param class-string $class
      */
@@ -82,17 +97,11 @@ final class Helper
 
     /**
      * @param class-string<CommandProviderInterface> $class
-     * @return Traversable<Command>|null
+     * @return Traversable<Command>
      * @psalm-suppress UnsafeInstantiation
-     * @phpstan-ignore catch.neverThrown
      */
-    public function newCommandProvider(string $class): ?Traversable
+    public function newCommandProvider(string $class): Traversable
     {
-        try {
-            return new $class();
-        } catch (Throwable) {
-            return null;
-        }
+        return new $class();
     }
-
 }

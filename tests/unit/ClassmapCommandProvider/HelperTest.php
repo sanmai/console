@@ -22,7 +22,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\CommandProviderHelper\Helper;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
-use Tests\ConsoleApp\Fixtures\BrokenCommandProvider;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\TestCommandProvider;
 
@@ -95,8 +94,6 @@ class HelperTest extends TestCase
         $commands = iterator_to_array($provider);
         $this->assertCount(2, $commands);
         $this->assertInstanceOf(HelloCommand::class, $commands[0]);
-
-        $this->assertNull($this->helper->newCommandProvider(BrokenCommandProvider::class));
-        $this->assertNull($this->helper->newCommandProvider(Helper::class));
     }
+
 }

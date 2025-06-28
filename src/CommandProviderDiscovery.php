@@ -49,9 +49,9 @@ final class CommandProviderDiscovery implements IteratorAggregate, CommandProvid
             ->cast($this->helper->realpath(...))
             ->filter($this->helper->isNotVendoredDependency(...))
             ->keys()
+            ->filter($this->helper->isNotOurNamespace(...))
             ->filter($this->helper->isCommandProviderSubclass(...))
             ->cast($this->helper->newCommandProvider(...))
-            ->filter()
             ->unpack();
     }
 }
