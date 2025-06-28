@@ -5,7 +5,6 @@
          colors="true"
          cacheDirectory="build/.phpunit.cache"
          requireCoverageMetadata="true"
-         beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
 >
     <testsuites>

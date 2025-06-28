@@ -83,6 +83,7 @@ class HelperTest extends TestCase
     public function testItChecksOurNamespace(): void
     {
         $this->assertTrue($this->helper->isNotOurNamespace(TestCommandProvider::class));
+        $this->assertTrue($this->helper->isNotOurNamespace('ConsoleApp'));
         $this->assertFalse($this->helper->isNotOurNamespace(CommandProviderDiscovery::class));
     }
 

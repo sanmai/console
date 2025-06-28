@@ -36,6 +36,7 @@ final class Helper
 
     public function __construct()
     {
+        /** @psalm-suppress PossiblyFalseOperand */
         $this->namespacePrefix = strtok(self::class, '\\') . '\\';
     }
 
@@ -84,7 +85,6 @@ final class Helper
     public function isNotOurNamespace(string $class): bool
     {
         return !str_starts_with($class, $this->namespacePrefix);
-
     }
 
     /**

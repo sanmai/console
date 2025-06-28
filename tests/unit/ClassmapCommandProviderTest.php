@@ -32,20 +32,6 @@ use function iterator_to_array;
 #[CoversClass(ClassmapCommandProvider::class)]
 class ClassmapCommandProviderTest extends TestCase
 {
-    public function testItMemoizes(): void
-    {
-        $loader = $this->createMock(ClassLoader::class);
-
-        $loader->expects($this->once())
-            ->method('getClassMap')
-            ->willReturn([]);
-
-        $provider = new ClassmapCommandProvider($loader);
-
-        $this->assertCount(0, $provider);
-        $this->assertCount(0, $provider);
-    }
-
     public function testItUsesHelper(): void
     {
         $fullPath = (new ReflectionClass(HelloCommand::class))->getFileName();
