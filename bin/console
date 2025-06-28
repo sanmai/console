@@ -22,6 +22,7 @@ declare(strict_types=1);
 use Composer\InstalledVersions;
 use ConsoleApp\ClassmapCommandProvider;
 use ConsoleApp\CommandProviderDiscovery;
+use ConsoleApp\CommandProviderProvider;
 use ConsoleApp\ConsoleApp;
 use ConsoleApp\ConfigLoader;
 use Composer\Autoload\ClassLoader;
@@ -65,8 +66,8 @@ if ('' !== $config) {
     );
 }
 
-$app = new ConsoleApp(
+$app = new ConsoleApp(new CommandProviderProvider(
     new ClassmapCommandProvider($classLoader),
     new CommandProviderDiscovery($classLoader)
-);
+));
 $app->run();

@@ -22,7 +22,6 @@ namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider;
-use ConsoleApp\CommandProviderDiscovery;
 use ConsoleApp\ConsoleApp;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
@@ -55,7 +54,6 @@ final class ConsoleAppTest extends TestCase
     {
         $app = new ConsoleApp(
             new ClassmapCommandProvider(self::$autoloader),
-            new CommandProviderDiscovery(self::$autoloader)
         );
 
         $this->assertTrue(
@@ -68,8 +66,7 @@ final class ConsoleAppTest extends TestCase
     public function testListInterfacesCommandExecution(): void
     {
         $application = new ConsoleApp(
-            new ClassmapCommandProvider(self::$autoloader),
-            new CommandProviderDiscovery(self::$autoloader)
+            new ClassmapCommandProvider(self::$autoloader)
         );
         $application->setAutoExit(false);
 
@@ -85,7 +82,6 @@ final class ConsoleAppTest extends TestCase
     {
         $app = new ConsoleApp(
             $this->createMock(ClassmapCommandProvider::class),
-            $this->createMock(CommandProviderDiscovery::class)
         );
         $version = $app->getVersion();
 
@@ -101,7 +97,6 @@ final class ConsoleAppTest extends TestCase
 
         $app = new ConsoleApp(
             $this->createMock(ClassmapCommandProvider::class),
-            $this->createMock(CommandProviderDiscovery::class),
             $versionReader
         );
         $version = $app->getVersion();
