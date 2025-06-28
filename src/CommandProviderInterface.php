@@ -22,6 +22,7 @@ namespace ConsoleApp;
 
 use Symfony\Component\Console\Command\Command;
 use Traversable;
+use Throwable;
 
 /**
  * Interface for providing commands to the console application

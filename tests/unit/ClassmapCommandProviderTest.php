@@ -19,10 +19,10 @@
 namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
+use ConsoleApp\ClassmapCommandProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\ClassmapCommandProvider;
-use ConsoleApp\ClassmapCommandProvider\Helper;
+use ConsoleApp\CommandProviderHelper\Helper;
 use Symfony\Component\Console\Command\Command;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use ReflectionClass;

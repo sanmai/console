@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-namespace ConsoleApp\ClassmapCommandProvider;
+namespace ConsoleApp\CommandProviderHelper;
 
 use ConsoleApp\CommandProviderInterface;
 use Symfony\Component\Console\Command\Command;
@@ -28,7 +28,7 @@ use function realpath;
 use function str_contains;
 use function str_ends_with;
 
-class Helper
+final class Helper
 {
     public function realpath(string $filename): string
     {
@@ -83,13 +83,14 @@ class Helper
     /**
      * @param class-string<CommandProviderInterface> $class
      * @return Traversable<Command>|null
+     * @psalm-suppress UnsafeInstantiation
+     * @phpstan-ignore catch.neverThrown
      */
     public function newCommandProvider(string $class): ?Traversable
     {
         try {
-            /** @psalm-suppress UnsafeInstantiation */
             return new $class();
-        } catch (Throwable) { /** @phpstan-ignore catch.neverThrown */
+        } catch (Throwable) {
             return null;
         }
     }

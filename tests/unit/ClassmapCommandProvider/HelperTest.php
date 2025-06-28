@@ -20,7 +20,7 @@ namespace Tests\ConsoleApp\ClassmapCommandProvider;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
-use ConsoleApp\ClassmapCommandProvider\Helper;
+use ConsoleApp\CommandProviderHelper\Helper;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
 use Tests\ConsoleApp\Fixtures\BrokenCommandProvider;
 use Tests\ConsoleApp\Fixtures\HelloCommand;

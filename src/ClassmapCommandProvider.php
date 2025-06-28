@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
-use ConsoleApp\ClassmapCommandProvider\Helper;
+use ConsoleApp\CommandProviderHelper\Helper;
 use IteratorAggregate;
 use Later\Interfaces\Deferred;
 use Symfony\Component\Console\Command\Command;

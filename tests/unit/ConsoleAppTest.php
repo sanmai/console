@@ -21,7 +21,7 @@ declare(strict_types=1);
 namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
-use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\CommandProviderHelper;
 use ConsoleApp\ConsoleApp;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
