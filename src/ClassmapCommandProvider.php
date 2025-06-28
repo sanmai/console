@@ -54,5 +54,4 @@ final class ClassmapCommandProvider implements IteratorAggregate, CommandProvide
             ->cast($this->helper->newCommand(...))
             ->filter();
     }
-
 }

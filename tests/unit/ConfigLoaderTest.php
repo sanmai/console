@@ -90,11 +90,8 @@ class ConfigLoaderTest extends TestCase
             ->onlyMethods(['getAutoloaderCount'])
             ->getMock();
 
-        // 2. Configure the replacement
         $configLoader->method('getAutoloaderCount')
-            ->willReturn(1, 2);
-
-        $configLoader = new ConfigLoader($classLoader, ['install_path' => '']);
+            ->willReturn(1, 1);
 
         $wasCalled = false;
         $spy = function () use (&$wasCalled) {
@@ -104,5 +101,24 @@ class ConfigLoaderTest extends TestCase
         $configLoader->handleAutoloader($spy);
 
         $this->assertTrue($wasCalled, 'Spy function was not called');
+    }
+
+    public function testHandleAutoloaderUnloads(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $classLoader->expects($this->once())
+            ->method('unregister');
+
+        $configLoader = $this->getMockBuilder(ConfigLoader::class)
+            ->setConstructorArgs([$classLoader, ['install_path' => '']])
+            ->onlyMethods(['getAutoloaderCount'])
+            ->getMock();
+
+        $configLoader->expects($this->exactly(2))
+            ->method('getAutoloaderCount')
+            ->willReturn(1, 2);
+
+        $configLoader->handleAutoloader(fn() => true);
     }
 }

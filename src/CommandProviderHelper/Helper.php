@@ -71,11 +71,11 @@ final class Helper
 
     /**
      * @param class-string<Command> $class
+     * @psalm-suppress UnsafeInstantiation
      */
     public function newCommand(string $class): ?Command
     {
         try {
-            /** @psalm-suppress UnsafeInstantiation */
             return new $class();
         } catch (Throwable) {
             return null;
