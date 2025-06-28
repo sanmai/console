@@ -22,6 +22,7 @@ namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\CommandProviderDiscovery;
 use ConsoleApp\ConsoleApp;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
@@ -52,7 +53,10 @@ final class ConsoleAppTest extends TestCase
     #[Depends('testClassMapIncludesFixtures')]
     public function testIt(): void
     {
-        $app = new ConsoleApp(new ClassmapCommandProvider(self::$autoloader));
+        $app = new ConsoleApp(
+            new ClassmapCommandProvider(self::$autoloader),
+            new CommandProviderDiscovery(self::$autoloader)
+        );
 
         $this->assertTrue(
             $app->has('hello'),
@@ -63,7 +67,10 @@ final class ConsoleAppTest extends TestCase
     #[Depends('testClassMapIncludesFixtures')]
     public function testListInterfacesCommandExecution(): void
     {
-        $application = new ConsoleApp(new ClassmapCommandProvider(self::$autoloader));
+        $application = new ConsoleApp(
+            new ClassmapCommandProvider(self::$autoloader),
+            new CommandProviderDiscovery(self::$autoloader)
+        );
         $application->setAutoExit(false);
 
         $tester = new ApplicationTester($application);
@@ -76,7 +83,10 @@ final class ConsoleAppTest extends TestCase
 
     public function testVersionDefault(): void
     {
-        $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class));
+        $app = new ConsoleApp(
+            $this->createMock(ClassmapCommandProvider::class),
+            $this->createMock(CommandProviderDiscovery::class)
+        );
         $version = $app->getVersion();
 
         $this->assertSame('UNKNOWN', $version);
@@ -89,7 +99,11 @@ final class ConsoleAppTest extends TestCase
             ->method('getVersionString')
             ->willReturn('1.2.3');
 
-        $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class), $versionReader);
+        $app = new ConsoleApp(
+            $this->createMock(ClassmapCommandProvider::class),
+            $this->createMock(CommandProviderDiscovery::class),
+            $versionReader
+        );
         $version = $app->getVersion();
 
         $this->assertSame('1.2.3', $version);

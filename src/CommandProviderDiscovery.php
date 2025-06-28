@@ -23,51 +23,35 @@ namespace ConsoleApp;
 use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider\Helper;
 use IteratorAggregate;
-use Later\Interfaces\Deferred;
 use Symfony\Component\Console\Command\Command;
 use Traversable;
 use Override;
 
-use function Later\later;
 use function Pipeline\take;
 
 /**
- * Command provider that discovers commands from Composer's classmap
+ * Discovers and provides commands from CommandProviderInterface implementations
  *
  * @implements IteratorAggregate<Command>
  */
-final class ClassmapCommandProvider implements IteratorAggregate, CommandProviderInterface
+final class CommandProviderDiscovery implements IteratorAggregate, CommandProviderInterface
 {
-    /** @var Deferred<Traversable<Command>> */
-    private readonly Deferred $commands;
-
     public function __construct(
         private readonly ClassLoader $classLoader,
         private readonly Helper $helper = new Helper(),
-    ) {
-        $this->commands = later(fn() => yield $this->listCommands());
-    }
+    ) {}
 
-    /**
-     * @return Traversable<Command>
-     */
-    private function listCommands(): Traversable
+    #[Override]
+    public function getIterator(): Traversable
     {
         return take($this->classLoader->getClassMap())
             ->stream()
             ->cast($this->helper->realpath(...))
             ->filter($this->helper->isNotVendoredDependency(...))
-            ->filter($this->helper->hasCommandInFilename(...))
             ->keys()
-            ->filter($this->helper->isCommandSubclass(...))
-            ->cast($this->helper->newCommand(...))
-            ->filter();
+            ->filter($this->helper->isCommandProviderSubclass(...))
+            ->cast($this->helper->newCommandProvider(...))
+            ->filter()
+            ->unpack();
     }
-
-    #[Override]
-    public function getIterator(): Traversable
-    {
-        return $this->commands->get();
-    }
-
 }

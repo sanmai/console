@@ -18,6 +18,7 @@
     },
     "require-dev": {
         "composer/composer": "^2.2",
+        "dg/bypass-finals": "^1.9",
         "ergebnis/composer-normalize": "^2.8",
         "friendsofphp/php-cs-fixer": "^3.17",
         "infection/infection": ">=0.29",

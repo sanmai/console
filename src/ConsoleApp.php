@@ -33,6 +33,7 @@ final class ConsoleApp extends Application
 
     public function __construct(
         private readonly ClassmapCommandProvider $commandProvider,
+        private readonly CommandProviderDiscovery $providerDiscovery,
         private readonly VersionReader $versionReader = new PlaceholderVersionReader(self::VERSION_INFO)
     ) {
         parent::__construct('Console App');
@@ -50,6 +51,7 @@ final class ConsoleApp extends Application
         // @phpstan-ignore-next-line
         return take(parent::getDefaultCommands())
             ->append($this->commandProvider)
+            ->append($this->providerDiscovery)
             ->toList();
     }
 }

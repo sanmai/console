@@ -18,8 +18,10 @@
 
 namespace ConsoleApp\ClassmapCommandProvider;
 
+use ConsoleApp\CommandProviderInterface;
 use Symfony\Component\Console\Command\Command;
 use Throwable;
+use Traversable;
 
 use function is_subclass_of;
 use function realpath;
@@ -65,7 +67,29 @@ class Helper
         try {
             /** @psalm-suppress UnsafeInstantiation */
             return new $class();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
+            return null;
+        }
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public function isCommandProviderSubclass(string $class): bool
+    {
+        return is_subclass_of($class, CommandProviderInterface::class);
+    }
+
+    /**
+     * @param class-string<CommandProviderInterface> $class
+     * @return Traversable<Command>|null
+     */
+    public function newCommandProvider(string $class): ?Traversable
+    {
+        try {
+            /** @psalm-suppress UnsafeInstantiation */
+            return new $class();
+        } catch (Throwable) { /** @phpstan-ignore catch.neverThrown */
             return null;
         }
     }
