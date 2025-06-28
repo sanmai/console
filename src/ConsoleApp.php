@@ -31,9 +31,6 @@ final class ConsoleApp extends Application
 {
     public const VERSION_INFO = '$Format:%h%d by %an +%ae$';
 
-    /**
-     * @param array<CommandProviderInterface> $commandProviders
-     */
     public function __construct(
         private readonly CommandProviderInterface $commandProvider,
         private readonly CommandProviderInterface $providerDiscovery,
