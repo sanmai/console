@@ -112,16 +112,7 @@ define('APP_ENV', $_ENV['APP_ENV'] ?? 'production');
 // Safe to include vendor/autoload.php if needed
 ```
 
-## Troubleshooting
-
-Commands not showing up?
-- Run `composer dump-autoload --optimize` (add `--dev` if your commands are in autoload-dev)
-- Verify your command files end with `Command.php`
-- Check that commands extend `Symfony\Component\Console\Command\Command`
-- Commands in `vendor/` are ignored by default
-- Commands with required constructor arguments are filtered out
-
-### Commands with Dependencies
+## Commands with Dependencies
 
 For commands that require constructor dependencies, implement the `CommandProviderInterface`:
 
@@ -153,6 +144,15 @@ class MyCommandProvider implements CommandProviderInterface, IteratorAggregate
 ```
 
 `CommandProviderInterface` implementations must have no required arguments in their constructor as they are instantiated automatically.
+
+## Troubleshooting
+
+Commands not showing up?
+- Run `composer dump-autoload --optimize` (add `--dev` if your commands are in autoload-dev)
+- Verify your command files end with `Command.php`
+- Check that commands extend `Symfony\Component\Console\Command\Command`
+- Commands in `vendor/` are ignored by default
+- Commands with required constructor arguments are filtered out
 
 ## Testing
 
