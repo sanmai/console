@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/github/license/sanmai/console.svg)](LICENSE)
 [![PHP Version](https://img.shields.io/packagist/php-v/sanmai/console.svg)](https://packagist.org/packages/sanmai/console)
 
-Zero-configuration console executable that auto-discovers your Symfony Console commands.
+Zero-configuration console executable that auto-discovers your [Symfony Console](https://github.com/symfony/console) commands.
 
 ## Requirements
 
@@ -16,7 +16,7 @@ composer require sanmai/console
 composer dump-autoload --optimize
 ```
 
-> Why `--optimize`? Command discovery uses Composer's classmap, which requires an optimized autoloader.
+> Why `--optimize`? Command discovery uses Composer's classmap, which requires an [optimized autoloader](https://getcomposer.org/doc/articles/autoloader-optimization.md).
 
 ## Quick Start
 
@@ -80,7 +80,7 @@ Even with Symfony's built-in command discovery, you still need to:
 3. Configure command discovery
 4. Make the file executable
 
-With `sanmai/console`, you get a ready-made `vendor/bin/console` executable installed via Composer. No files to create, no permissions to set - just install the package and `vendor/bin/console` is ready to use.
+With `sanmai/console`, you get a ready-made `vendor/bin/console` executable [installed via Composer](https://packagist.org/packages/sanmai/console). No files to create, no permissions to set - just install the package and `vendor/bin/console` is ready to use.
 
 ## Bootstrap Configuration
 
