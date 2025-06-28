@@ -96,6 +96,16 @@ Configure a custom bootstrap script in your `composer.json`:
 }
 ```
 
+Or use Composer commands to set everything up:
+
+```bash
+# Configure bootstrap script
+composer config extra.console.bootstrap app/bootstrap.php
+
+# Enable optimized autoloader (required for command discovery)
+composer config optimize-autoloader true
+```
+
 The bootstrap script runs after Composer's autoloader is initialized. Including `vendor/autoload.php` again is safe - the library handles this gracefully.
 
 Example bootstrap script:
