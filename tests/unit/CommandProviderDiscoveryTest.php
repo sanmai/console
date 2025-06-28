@@ -19,9 +19,12 @@
 namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
+use ConsoleApp\CommandProviderHelper\Helper;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\CommandProviderDiscovery;
+use ReflectionClass;
+use Symfony\Component\Console\Command\Command;
 use Tests\ConsoleApp\Fixtures\TestCommandProvider;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;
@@ -31,42 +34,47 @@ use function iterator_to_array;
 #[CoversClass(CommandProviderDiscovery::class)]
 class CommandProviderDiscoveryTest extends TestCase
 {
-    public function testItDiscoversProviders(): void
+    public function testItUsesHelper(): void
     {
+        $fullPath = (new ReflectionClass(HelloCommand::class))->getFileName();
+
         $loader = $this->createMock(ClassLoader::class);
 
         $loader->expects($this->once())
             ->method('getClassMap')
-            ->willReturn([
-                TestCommandProvider::class => __DIR__ . '/Fixtures/TestCommandProvider.php',
-                HelloCommand::class => __DIR__ . '/Fixtures/HelloCommand.php',
-            ]);
+            ->willReturn([TestCommandProvider::class => '../../src/TestCommandProvider.php']);
 
-        $provider = new CommandProviderDiscovery($loader);
+        $helper = $this->createMock(Helper::class);
 
-        $commands = iterator_to_array($provider, false);
+        $helper->expects($this->once())
+            ->method('realpath')
+            ->with('../../src/TestCommandProvider.php')
+            ->willReturn($fullPath);
 
-        // Should have 2 commands from TestCommandProvider
-        $this->assertCount(2, $commands);
-        $this->assertInstanceOf(HelloCommand::class, $commands[0]);
-        $this->assertInstanceOf(OptionalArgsCommand::class, $commands[1]);
-    }
+        $helper->expects($this->once())
+            ->method('isNotVendoredDependency')
+            ->with($fullPath)
+            ->willReturn(true);
 
-    public function testItFiltersOutNonProviders(): void
-    {
-        $loader = $this->createMock(ClassLoader::class);
+        $helper->expects($this->once())
+            ->method('isNotOurNamespace')
+            ->with(TestCommandProvider::class)
+            ->willReturn(true);
 
-        $loader->expects($this->once())
-            ->method('getClassMap')
-            ->willReturn([
-                HelloCommand::class => __DIR__ . '/Fixtures/HelloCommand.php',
-            ]);
+        $helper->expects($this->once())
+            ->method('isCommandProviderSubclass')
+            ->with(TestCommandProvider::class)
+            ->willReturn(true);
 
-        $provider = new CommandProviderDiscovery($loader);
+        $mockCommand = $this->createMock(Command::class);
 
-        $commands = iterator_to_array($provider);
+        $helper->expects($this->once())
+            ->method('newCommandProvider')
+            ->with(TestCommandProvider::class)
+            ->willReturn(new TestCommandProvider($mockCommand));
 
-        // Should have no commands as HelloCommand is not a provider
-        $this->assertCount(0, $commands);
+        $provider = new CommandProviderDiscovery($loader, $helper);
+
+        $this->assertSame([$mockCommand], iterator_to_array($provider, false));
     }
 }

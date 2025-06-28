@@ -20,13 +20,24 @@ namespace Tests\ConsoleApp\Fixtures;
 
 use ConsoleApp\CommandProviderInterface;
 use IteratorAggregate;
+use Symfony\Component\Console\Command\Command;
 use Traversable;
 
 class TestCommandProvider implements CommandProviderInterface, IteratorAggregate
 {
+    /** @var array<Command> */
+    private readonly array $commands;
+
+    public function __construct(Command ...$commands)
+    {
+        $this->commands = $commands ?: [
+            new HelloCommand(),
+            new OptionalArgsCommand(),
+        ];
+    }
+
     public function getIterator(): Traversable
     {
-        yield new HelloCommand();
-        yield new OptionalArgsCommand();
+        yield from $this->commands;
     }
 }
