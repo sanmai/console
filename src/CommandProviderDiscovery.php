@@ -51,6 +51,7 @@ final class CommandProviderDiscovery implements IteratorAggregate, CommandProvid
             ->keys()
             ->filter($this->helper->isNotOurNamespace(...))
             ->filter($this->helper->isCommandProviderSubclass(...))
+            ->filter($this->helper->hasCommandProviderSuffix(...))
             ->cast($this->helper->newCommandProvider(...))
             ->unpack();
     }

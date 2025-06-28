@@ -58,10 +58,10 @@ class HelperTest extends TestCase
         $this->assertFalse($this->helper->isNotVendoredDependency('/tmp/vendor/some/package/src/Example.php'));
     }
 
-    public function testItChecksCommandInFilename(): void
+    public function testItChecksCommandSuffix(): void
     {
-        $this->assertTrue($this->helper->hasCommandInFilename('ExampleCommand.php'));
-        $this->assertFalse($this->helper->hasCommandInFilename('Example.php'));
+        $this->assertTrue($this->helper->hasCommandSuffix(HelloCommand::class));
+        $this->assertFalse($this->helper->hasCommandSuffix(Helper::class));
     }
 
     public function testItChecksCommandSubclass(): void
@@ -92,6 +92,12 @@ class HelperTest extends TestCase
         $this->assertTrue($this->helper->isCommandProviderSubclass(TestCommandProvider::class));
         $this->assertFalse($this->helper->isCommandProviderSubclass(HelloCommand::class));
         $this->assertFalse($this->helper->isCommandProviderSubclass(Helper::class));
+    }
+
+    public function testItChecksCommandProviderSuffix(): void
+    {
+        $this->assertTrue($this->helper->hasCommandProviderSuffix(TestCommandProvider::class));
+        $this->assertFalse($this->helper->hasCommandProviderSuffix(HelloCommand::class));
     }
 
     public function testNewCommandProvider(): void

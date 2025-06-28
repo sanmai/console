@@ -28,7 +28,7 @@ use function realpath;
 use function str_contains;
 use function str_ends_with;
 use function str_starts_with;
-use function strtok;
+use function strstr;
 
 final class Helper
 {
@@ -37,7 +37,7 @@ final class Helper
     public function __construct()
     {
         /** @psalm-suppress PossiblyFalseOperand */
-        $this->namespacePrefix = strtok(self::class, '\\') . '\\';
+        $this->namespacePrefix = strstr(self::class, '\\', true) . '\\';
     }
 
     public function realpath(string $filename): string
@@ -56,10 +56,6 @@ final class Helper
         return !str_contains($filename, '/vendor/');
     }
 
-    public function hasCommandInFilename(string $filename): bool
-    {
-        return str_ends_with($filename, 'Command.php');
-    }
 
     /**
      * @param class-string $class
@@ -67,6 +63,14 @@ final class Helper
     public function isCommandSubclass(string $class): bool
     {
         return is_subclass_of($class, Command::class);
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public function hasCommandSuffix(string $class): bool
+    {
+        return str_ends_with($class, 'Command');
     }
 
     /**
@@ -93,6 +97,14 @@ final class Helper
     public function isCommandProviderSubclass(string $class): bool
     {
         return is_subclass_of($class, CommandProviderInterface::class);
+    }
+
+    /**
+     * @param class-string $class
+     */
+    public function hasCommandProviderSuffix(string $class): bool
+    {
+        return str_ends_with($class, 'CommandProvider');
     }
 
     /**

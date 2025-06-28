@@ -65,6 +65,11 @@ final class CommandProviderDiscoveryTest extends TestCase
             ->with(TestCommandProvider::class)
             ->willReturn(true);
 
+        $helper->expects($this->once())
+            ->method('hasCommandProviderSuffix')
+            ->with(TestCommandProvider::class)
+            ->willReturn(true);
+
         $mockCommand = $this->createMock(Command::class);
 
         $helper->expects($this->once())
