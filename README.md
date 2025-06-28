@@ -16,7 +16,7 @@ composer require sanmai/console
 composer dump-autoload --optimize
 ```
 
-> **Why --optimize?** This library discovers commands by scanning Composer's classmap, which requires an optimized autoloader. This is the trade-off for zero-configuration simplicity.
+> Why `--optimize`? Command discovery uses Composer's classmap, which requires an optimized autoloader.
 
 ## Quick Start
 
@@ -38,6 +38,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 class HelloCommand extends Command
 {
+    // Avoid side effects in constructors - commands are instantiated during discovery.
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('Hello, World!');
@@ -58,16 +60,17 @@ composer dump-autoload --optimize
 vendor/bin/console hello
 ```
 
-That's it! No configuration files, no manual command registration. Just create command files and they're automatically discovered.
+That's it! No configuration files, no manual command registration.
 
 ## How It Works
 
 This library provides a ready-made `vendor/bin/console` executable that automatically discovers all Symfony Console commands in your project by:
 
 1. Scanning Composer's optimized classmap
-2. Finding classes that end with `Command.php`
-3. Loading those that extend `Symfony\Component\Console\Command\Command`
-4. Filtering out vendored files
+2. Finding classes that extend `Symfony\Component\Console\Command\Command` and end with `Command`
+3. Filtering out vendored files
+4. Instantiating each command (commands that throw exceptions or errors are skipped)
+5. Discovering `CommandProviderInterface` implementations (classes ending with `CommandProvider`) for commands with dependencies
 
 ## The Problem It Solves
 
@@ -79,16 +82,90 @@ Even with Symfony's built-in command discovery, you still need to:
 
 With `sanmai/console`, you get a ready-made `vendor/bin/console` executable installed via Composer. No files to create, no permissions to set - just install the package and `vendor/bin/console` is ready to use.
 
+## Bootstrap Configuration
+
+Configure a custom bootstrap script in your `composer.json`:
+
+```json
+{
+    "extra": {
+        "console": {
+            "bootstrap": "app/bootstrap.php"
+        }
+    }
+}
+```
+
+Or use Composer commands to set everything up:
+
+```bash
+# Configure bootstrap script
+composer config extra.console.bootstrap app/bootstrap.php
+
+# Enable optimized autoloader (required for command discovery)
+composer config optimize-autoloader true
+```
+
+The bootstrap script runs after Composer's autoloader is initialized. Including `vendor/autoload.php` again is safe - the library handles this gracefully.
+
+Example bootstrap script:
+
+```php
+<?php
+// bootstrap.php
+
+// Set up error handlers, load environment variables, configure services
+define('APP_ENV', $_ENV['APP_ENV'] ?? 'production');
+
+// Composer autoloader is already loaded
+// Safe to include vendor/autoload.php if needed
+```
+
+## Commands with Dependencies
+
+For commands that require constructor dependencies, implement the `CommandProviderInterface`:
+
+```php
+<?php
+// src/DatabaseCommandProvider.php
+namespace App;
+
+use ConsoleApp\CommandProviderInterface;
+use IteratorAggregate;
+use Symfony\Component\Console\Command\Command;
+
+class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggregate
+{
+    // Provider must have a no-required-argument constructor
+    public function __construct(int $optional = 0) {}
+
+    public function getIterator(): \Traversable
+    {
+        // Build your services/dependencies
+        $database = new DatabaseConnection();
+        $cache = new CacheService();
+
+        // Yield commands with their dependencies
+        yield new DatabaseMigrationCommand($database);
+        yield new CacheClearCommand($cache);
+    }
+}
+```
+
+`CommandProviderInterface` implementations must have no required arguments in their constructor as they are instantiated automatically.
+
 ## Troubleshooting
 
-**Commands not showing up?**
-- Ensure you ran `composer dump-autoload --optimize`
-- Verify your command files end with `Command.php`
+Commands not showing up?
+- Run `composer dump-autoload --optimize` (add `--dev` if your commands are in autoload-dev)
+- Verify your command class names end with `Command` (e.g., `HelloCommand`, `MigrateCommand`)
 - Check that commands extend `Symfony\Component\Console\Command\Command`
-- Commands in `vendor/` are ignored by design
+- Commands in `vendor/` are ignored by default
+- Commands with required constructor arguments are filtered out
+- Command providers must have class names ending with `CommandProvider`
 
 ## Testing
 
 ```bash
-vendor/bin/phpunit
+make -j -k
 ```

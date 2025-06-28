@@ -1,0 +1,25 @@
+{
+    "name": "test/console-integration",
+    "description": "Integration test project for console bootstrap functionality",
+    "require": {
+        "sanmai/console": "*"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TestApp\\": "src/"
+        }
+    },
+    "extra": {
+        "console": {
+            "bootstrap": "bootstrap.php"
+        }
+    }
+}

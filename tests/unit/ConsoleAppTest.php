@@ -22,12 +22,14 @@ namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\CommandProviderInterface;
 use ConsoleApp\ConsoleApp;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\ApplicationTester;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
+use VersionInfo\Contracts\VersionReader;
 
 #[CoversClass(ConsoleApp::class)]
 final class ConsoleAppTest extends TestCase
@@ -73,11 +75,24 @@ final class ConsoleAppTest extends TestCase
         $this->assertStringContainsString('Hello, world!', $tester->getDisplay());
     }
 
-    public function testVersion(): void
+    public function testVersionDefault(): void
     {
-        $app = new ConsoleApp($this->createMock(ClassmapCommandProvider::class));
+        $app = new ConsoleApp($this->createMock(CommandProviderInterface::class));
         $version = $app->getVersion();
 
         $this->assertSame('UNKNOWN', $version);
+    }
+
+    public function testVersionProvided(): void
+    {
+        $versionReader = $this->createMock(VersionReader::class);
+        $versionReader->expects($this->once())
+            ->method('getVersionString')
+            ->willReturn('1.2.3');
+
+        $app = new ConsoleApp($this->createMock(CommandProviderInterface::class), $versionReader);
+        $version = $app->getVersion();
+
+        $this->assertSame('1.2.3', $version);
     }
 }

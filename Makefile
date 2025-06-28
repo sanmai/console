@@ -24,7 +24,7 @@ export XDEBUG_MODE=coverage
 
 # PHPStan
 PHPSTAN=vendor/bin/phpstan
-PHPSTAN_ARGS_TESTS=analyse src tests --level=2 -c .phpstan.neon
+PHPSTAN_ARGS_TESTS=analyse src tests/unit --level=2 -c .phpstan.neon
 PHPSTAN_ARGS_SRC=analyse -c .phpstan.src.neon
 
 # Psalm
@@ -36,8 +36,8 @@ COMPOSER=$(PHP) $(shell which composer)
 
 # Infection
 INFECTION=vendor/bin/infection
-MIN_MSI=50
-MIN_COVERED_MSI=50
+MIN_MSI=100
+MIN_COVERED_MSI=100
 INFECTION_ARGS=--min-msi=$(MIN_MSI) --min-covered-msi=$(MIN_COVERED_MSI) --threads=$(JOBS) --coverage=build/logs --log-verbosity=default --show-mutations --no-interaction
 
 all: test
@@ -74,7 +74,7 @@ ci-cs: prerequisites
 ##############################################################
 
 .PHONY: test
-test: analyze phpunit infection composer-validate yamllint
+test: phpunit analyze infection composer-validate yamllint
 
 .PHONY: composer-validate
 composer-validate: test-prerequisites

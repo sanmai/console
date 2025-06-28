@@ -16,23 +16,34 @@
  * limitations under the License.
  */
 
-namespace Tests\ConsoleApp\Fixtures;
+declare(strict_types=1);
 
-use Symfony\Component\Console\Attribute\AsCommand;
+namespace ConsoleApp;
+
+use IteratorAggregate;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Traversable;
+use Override;
 
-#[AsCommand(
-    name: 'hello',
-    description: 'Say hello to the world',
-    aliases: ['hello-world']
-)]
-class HelloCommand extends Command
+use function Pipeline\take;
+
+/**
+ * @implements IteratorAggregate<Command>
+ */
+final class CommandProviderProvider implements IteratorAggregate, CommandProviderInterface
 {
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    /** @var array<CommandProviderInterface> */
+    private readonly array $providers;
+
+    public function __construct(
+        CommandProviderInterface ...$providers,
+    ) {
+        $this->providers = $providers;
+    }
+
+    #[Override]
+    public function getIterator(): Traversable
     {
-        $output->writeln('Hello, world!');
-        return Command::SUCCESS;
+        return take(...$this->providers);
     }
 }
