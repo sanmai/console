@@ -20,7 +20,7 @@ namespace Tests\ConsoleApp;
 
 use Composer\Autoload\ClassLoader;
 use ConsoleApp\ClassmapCommandProvider;
-use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\CommandProviderDiscovery;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
@@ -32,8 +32,7 @@ use function array_map;
 use function get_class;
 use function array_merge;
 
-#[CoversClass(ClassmapCommandProvider::class)]
-#[CoversClass(CommandProviderDiscovery::class)]
+#[CoversNothing]
 class CommandProviderIntegrationTest extends TestCase
 {
     public function testItDiscoversCommandsFromProviders(): void

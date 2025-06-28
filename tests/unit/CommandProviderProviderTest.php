@@ -39,5 +39,6 @@ class CommandProviderProviderTest extends TestCase
         $this->assertCount(4, $commands);
         $this->assertInstanceOf(HelloCommand::class, $commands[0]);
         $this->assertInstanceOf(OptionalArgsCommand::class, $commands[1]);
+        $this->assertInstanceOf(HelloCommand::class, $commands[2]);
     }
 }

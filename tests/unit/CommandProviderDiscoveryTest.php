@@ -27,7 +27,6 @@ use ReflectionClass;
 use Symfony\Component\Console\Command\Command;
 use Tests\ConsoleApp\Fixtures\TestCommandProvider;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
-use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;
 
 use function iterator_to_array;
 
