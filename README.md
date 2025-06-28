@@ -121,7 +121,7 @@ Commands not showing up?
 - Commands in `vendor/` are ignored by default
 - Commands with required constructor arguments are filtered out
 
-## Commands with Dependencies
+### Commands with Dependencies
 
 For commands that require constructor dependencies, implement the `CommandProviderInterface`:
 
@@ -131,9 +131,10 @@ For commands that require constructor dependencies, implement the `CommandProvid
 namespace App;
 
 use ConsoleApp\CommandProviderInterface;
+use IteratorAggregate;
 use Symfony\Component\Console\Command\Command;
 
-class MyCommandProvider implements CommandProviderInterface
+class MyCommandProvider implements CommandProviderInterface, IteratorAggregate
 {
     // Provider must have a no-required-argument constructor
     public function __construct(int $optional = 0) {}
@@ -151,7 +152,7 @@ class MyCommandProvider implements CommandProviderInterface
 }
 ```
 
-CommandProviderInterface implementations must have no required arguments in their constructor as they are instantiated automatically.
+`CommandProviderInterface` implementations must have no required arguments in their constructor as they are instantiated automatically.
 
 ## Testing
 
