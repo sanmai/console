@@ -11,7 +11,7 @@ Zero-configuration console executable that auto-discovers your [Symfony Console]
 composer require sanmai/console
 ```
 
-### For Auto-discovery
+### For Auto-Discovery
 
 If you want commands to be discovered automatically:
 
@@ -21,7 +21,7 @@ composer dump-autoload --optimize
 
 > Auto-discovery uses Composer's classmap, which requires an [optimized autoloader](https://getcomposer.org/doc/articles/autoloader-optimization.md).
 
-### For Modern PSR-4 Projects
+### For PSR-4 Projects
 
 If you prefer explicit command registration without optimization, configure a [custom provider](#custom-provider-configuration).
 
@@ -73,13 +73,13 @@ That's it! No configuration files, no manual command registration.
 
 This library provides a ready-made `vendor/bin/console` executable that automatically discovers all Symfony Console commands in your project:
 
-1. **Auto-discovery** (requires optimized autoloader):
+1. Auto-discovery (requires an optimized autoloader):
    - Scans Composer's classmap for classes extending `Command` with names ending in `Command`
    - Finds `CommandProviderInterface` implementations with names ending in `CommandProvider`
    - Filters out vendor files
    - Skips classes that throw exceptions during instantiation
 
-2. **Custom provider** (optional, no optimization needed):
+2. Custom provider (optional, no optimization needed):
    - Loads the provider specified in `extra.console.provider`
    - Provider returns command instances via its iterator
    - Works alongside auto-discovery
@@ -87,6 +87,7 @@ This library provides a ready-made `vendor/bin/console` executable that automati
 ## The Problem It Solves
 
 Even with Symfony's built-in command discovery, you still need to:
+
 1. Create a console executable file (e.g., `bin/console`)
 2. Set up the Application instance
 3. Configure command discovery
@@ -156,6 +157,7 @@ composer config extra.console.provider 'App\\Console\\CommandProvider'
 ```
 
 The custom provider:
+
 - Works alongside auto-discovery (doesn't replace it)
 - Doesn't need the `CommandProvider` suffix
 - Must implement `CommandProviderInterface`
@@ -205,6 +207,7 @@ class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggre
 ## Troubleshooting
 
 Commands not showing up?
+
 - Run `composer dump-autoload --optimize` (add `--dev` if your commands are in autoload-dev)
 - Verify your command class names end with `Command` (e.g., `HelloCommand`, `MigrateCommand`)
 - Check that commands extend `Symfony\Component\Console\Command\Command`
