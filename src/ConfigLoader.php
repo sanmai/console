@@ -73,6 +73,9 @@ final class ConfigLoader
         return $this->config;
     }
 
+    /**
+     * Returns the path to the bootstrap file.
+     */
     public function getBootstrapPath(): string
     {
         // @phpstan-ignore-next-line
@@ -80,6 +83,7 @@ final class ConfigLoader
     }
 
     /**
+     * Returns the class name of the command provider.
      * @return class-string<CommandProviderInterface>|null
      */
     public function getProviderClass(): ?string
