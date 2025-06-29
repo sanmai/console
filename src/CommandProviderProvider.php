@@ -20,6 +20,7 @@ declare(strict_types=1);
 
 namespace ConsoleApp;
 
+use Composer\Autoload\ClassLoader;
 use IteratorAggregate;
 use Symfony\Component\Console\Command\Command;
 use Traversable;
@@ -45,5 +46,21 @@ final class CommandProviderProvider implements IteratorAggregate, CommandProvide
     public function getIterator(): Traversable
     {
         return take(...$this->providers);
+    }
+
+    /**
+     * @return Traversable<CommandProviderInterface>
+     */
+    public static function defaultProviders(ConfigLoader $configLoader, ClassLoader $classLoader): Traversable
+    {
+        yield new ClassmapCommandProvider($classLoader);
+        yield new CommandProviderDiscovery($classLoader);
+
+        // Custom provider goes last to make sure it can override any commands from the default providers
+        $providerClass = $configLoader->getProviderClass();
+
+        if (null !== $providerClass) {
+            yield new $providerClass();
+        }
     }
 }

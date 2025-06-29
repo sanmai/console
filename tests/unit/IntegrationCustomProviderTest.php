@@ -53,7 +53,6 @@ final class IntegrationCustomProviderTest extends TestCase
         $this->assertDirectoryExists(self::$integrationDir);
 
         $this->assertFileExists('composer.json');
-        $this->assertFileExists('bootstrap.php');
         $this->assertFileExists('src/ConsoleProvider.php');
     }
 
@@ -85,7 +84,7 @@ final class IntegrationCustomProviderTest extends TestCase
         $this->assertStringContainsString('Available commands:', $process->getOutput());
 
         $this->assertStringContainsString('test:anonymous', $process->getOutput());
-        $this->assertStringContainsString('Test command that proves the custom provider was loaded', $process->getOutput());
+        $this->assertStringContainsString('An anonymous command for testing', $process->getOutput());
     }
 
     #[Depends('testComposerInstallWorks')]

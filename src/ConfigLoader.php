@@ -35,6 +35,8 @@ final class ConfigLoader
     /** @var array{install_path: string, ...} */
     private readonly array $rootPackage;
 
+    private ?object $config = null;
+
     /**
      * @param array{install_path: string}|null $rootPackage
      */
@@ -51,18 +53,39 @@ final class ConfigLoader
         return $file->fread($file->getSize());
     }
 
-    public function getBootstrapPath(): string
+    private function getConfig(): object
     {
+        if (null !== $this->config) {
+            return $this->config;
+        }
+
         $path = $this->rootPackage['install_path'] . '/composer.json';
 
-        $json = json_decode(
+        /** @var object */
+        $config = json_decode(
             json: (string) $this->readFile($path),
             associative: false,
             flags: JSON_THROW_ON_ERROR,
         );
 
+        $this->config = $config;
+
+        return $this->config;
+    }
+
+    public function getBootstrapPath(): string
+    {
         // @phpstan-ignore-next-line
-        return $json->extra->console->bootstrap ?? '';
+        return $this->getConfig()->extra->console->bootstrap ?? '';
+    }
+
+    /**
+     * @return class-string<CommandProviderInterface>|null
+     */
+    public function getProviderClass(): ?string
+    {
+        // @phpstan-ignore-next-line
+        return $this->getConfig()->extra->console->provider ?? null;
     }
 
     public function handleAutoloader(callable $callback): void

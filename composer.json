@@ -37,6 +37,7 @@
     "autoload-dev": {
         "psr-4": {
             "TestApp\\": "tests/integration/bootstrap/src/",
+            "TestProviderApp\\": "tests/integration/custom/src/",
             "Tests\\ConsoleApp\\": "tests/unit/"
         }
     },
