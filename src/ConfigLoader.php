@@ -21,10 +21,12 @@ declare(strict_types=1);
 namespace ConsoleApp;
 
 use Composer\InstalledVersions;
+use Later\Interfaces\Deferred;
 use SplFileObject;
 use Composer\Autoload\ClassLoader;
 
 use function json_decode;
+use function Later\later;
 use function spl_autoload_functions;
 use function count;
 
@@ -35,7 +37,8 @@ final class ConfigLoader
     /** @var array{install_path: string, ...} */
     private readonly array $rootPackage;
 
-    private ?object $config = null;
+    /** @var Deferred<object> */
+    private Deferred $config;
 
     /**
      * @param array{install_path: string}|null $rootPackage
@@ -45,6 +48,7 @@ final class ConfigLoader
         ?array $rootPackage = null,
     ) {
         $this->rootPackage = $rootPackage ?? InstalledVersions::getRootPackage();
+        $this->config = later($this->getConfig(...));
     }
 
     protected function readFile(string $path): string|false
@@ -53,24 +57,18 @@ final class ConfigLoader
         return $file->fread($file->getSize());
     }
 
-    private function getConfig(): object
+    /**
+     * @return iterable<object>
+     */
+    private function getConfig(): iterable
     {
-        if (null !== $this->config) {
-            return $this->config;
-        }
-
         $path = $this->rootPackage['install_path'] . '/composer.json';
 
-        /** @var object */
-        $config = json_decode(
+        yield (object) json_decode(
             json: (string) $this->readFile($path),
             associative: false,
             flags: JSON_THROW_ON_ERROR,
         );
-
-        $this->config = $config;
-
-        return $this->config;
     }
 
     /**
@@ -79,7 +77,7 @@ final class ConfigLoader
     public function getBootstrapPath(): string
     {
         // @phpstan-ignore-next-line
-        return $this->getConfig()->extra->console->bootstrap ?? '';
+        return $this->config->get()->extra->console->bootstrap ?? '';
     }
 
     /**
@@ -89,7 +87,7 @@ final class ConfigLoader
     public function getProviderClass(): ?string
     {
         // @phpstan-ignore-next-line
-        return $this->getConfig()->extra->console->provider ?? null;
+        return $this->config->get()->extra->console->provider ?? null;
     }
 
     public function handleAutoloader(callable $callback): void

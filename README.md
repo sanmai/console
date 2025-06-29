@@ -86,14 +86,9 @@ This library provides a ready-made `vendor/bin/console` executable that automati
 
 ## The Problem It Solves
 
-Even with Symfony's built-in command discovery, you still need to:
+I found myself writing [the same console bootstrap script](https://symfony.com/doc/current/components/console.html#creating-a-console-application) over and over. Even with Symfony's command discovery features, you still had to write a lot of boilerplate code.
 
-1. Create a console executable file (e.g., `bin/console`)
-2. Set up the Application instance
-3. Configure command discovery
-4. Make the file executable
-
-With `sanmai/console`, you get a ready-made `vendor/bin/console` executable [installed via Composer](https://packagist.org/packages/sanmai/console). No files to create, no permissions to set - just install the package and `vendor/bin/console` is ready to use.
+With `sanmai/console`, you get a ready-made `vendor/bin/console` executable [installed via Composer](https://packagist.org/packages/sanmai/console). No files to create, no permissions to set - just install the package and `vendor/bin/console` is ready to use. It even works in legacy projects that never had Symfony Console commands before.
 
 ## Configuration
 
