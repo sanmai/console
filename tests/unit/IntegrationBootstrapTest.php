@@ -39,7 +39,8 @@ final class IntegrationBootstrapTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$originalDir = getcwd();
-        self::$integrationDir = realpath(__DIR__ . '/../integration');
+        self::$integrationDir = realpath(__DIR__ . '/../integration/bootstrap/');
+
         chdir(self::$integrationDir);
     }
 

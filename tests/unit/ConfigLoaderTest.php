@@ -32,7 +32,7 @@ final class ConfigLoaderTest extends TestCase
         $classLoader = $this->createMock(ClassLoader::class);
 
         $configLoader = new ConfigLoader($classLoader, [
-            'install_path' => __DIR__ . '/../integration',
+            'install_path' => __DIR__ . '/../integration/bootstrap',
         ]);
 
         $this->assertSame(

@@ -9,7 +9,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../../"
+            "url": "../../../"
         }
     ],
     "autoload": {
