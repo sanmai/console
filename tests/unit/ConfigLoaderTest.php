@@ -93,6 +93,23 @@ final class ConfigLoaderTest extends TestCase
         $configLoader->getBootstrapPath();
     }
 
+    public function testGetConfigMemoized(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $configLoader = $this->getMockBuilder(ConfigLoader::class)
+            ->setConstructorArgs([$classLoader, ['install_path' => '']])
+            ->onlyMethods(['readFile'])
+            ->getMock();
+
+        $configLoader->expects($this->once())
+            ->method('readFile')
+            ->willReturn('{}');
+
+        $this->assertSame('', $configLoader->getBootstrapPath());
+        $this->assertNull($configLoader->getProviderClass());
+    }
+
     public function testAutoloaderCount(): void
     {
         $classLoader = $this->createMock(ClassLoader::class);
