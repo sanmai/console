@@ -82,7 +82,9 @@ Even with Symfony's built-in command discovery, you still need to:
 
 With `sanmai/console`, you get a ready-made `vendor/bin/console` executable [installed via Composer](https://packagist.org/packages/sanmai/console). No files to create, no permissions to set - just install the package and `vendor/bin/console` is ready to use.
 
-## Bootstrap Configuration
+## Configuration
+
+### Bootstrap Scripts
 
 Configure a custom bootstrap script in your `composer.json`:
 
@@ -96,7 +98,7 @@ Configure a custom bootstrap script in your `composer.json`:
 }
 ```
 
-Or use Composer commands to set everything up:
+Or use Composer commands:
 
 ```bash
 # Configure bootstrap script
@@ -120,6 +122,34 @@ define('APP_ENV', $_ENV['APP_ENV'] ?? 'production');
 // Composer autoloader is already loaded
 // Safe to include vendor/autoload.php if needed
 ```
+
+### Custom Provider Configuration
+
+In addition to auto-discovery, you can specify a single command provider class:
+
+```json
+{
+    "extra": {
+        "console": {
+            "provider": "App\\Console\\CommandProvider"
+        }
+    }
+}
+```
+
+Or using Composer command:
+
+```bash
+composer config extra.console.provider 'App\\Console\\CommandProvider'
+```
+
+When a provider is configured:
+- The provider class doesn't need to follow the `CommandProvider` suffix convention
+- It must still implement `CommandProviderInterface`
+
+This is useful for:
+- More convenient (optimized autoloader is not necessary)
+- Using providers that don't follow naming conventions
 
 ## Commands with Dependencies
 
