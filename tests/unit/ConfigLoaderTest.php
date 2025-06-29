@@ -32,7 +32,7 @@ final class ConfigLoaderTest extends TestCase
         $classLoader = $this->createMock(ClassLoader::class);
 
         $configLoader = new ConfigLoader($classLoader, [
-            'install_path' => __DIR__ . '/../integration',
+            'install_path' => __DIR__ . '/../integration/bootstrap',
         ]);
 
         $this->assertSame(
@@ -51,6 +51,29 @@ final class ConfigLoaderTest extends TestCase
             '',
             $configLoader->getBootstrapPath()
         );
+    }
+
+    public function testGetProviderClass(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $configLoader = new ConfigLoader($classLoader, [
+            'install_path' => __DIR__ . '/../integration/custom',
+        ]);
+
+        $this->assertSame(
+            \TestProviderApp\ConsoleProvider::class,
+            $configLoader->getProviderClass()
+        );
+    }
+
+    public function testGetProviderClassNone(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $configLoader = new ConfigLoader($classLoader);
+
+        $this->assertNull($configLoader->getProviderClass());
     }
 
     public function testGetBootstrapPathFileReadError(): void

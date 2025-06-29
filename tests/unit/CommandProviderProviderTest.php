@@ -18,12 +18,17 @@
 
 namespace Tests\ConsoleApp;
 
+use ConsoleApp\ClassmapCommandProvider;
+use ConsoleApp\CommandProviderDiscovery;
 use ConsoleApp\CommandProviderProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use TestProviderApp\ConsoleProvider;
 use Tests\ConsoleApp\Fixtures\TestCommandProvider;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\OptionalArgsCommand;
+use ConsoleApp\ConfigLoader;
+use Composer\Autoload\ClassLoader;
 
 use function iterator_to_array;
 
@@ -40,5 +45,38 @@ final class CommandProviderProviderTest extends TestCase
         $this->assertInstanceOf(HelloCommand::class, $commands[0]);
         $this->assertInstanceOf(OptionalArgsCommand::class, $commands[1]);
         $this->assertInstanceOf(HelloCommand::class, $commands[2]);
+    }
+
+    public function testItBuildsDefaultProviders(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+        $configLoader = $this->createMock(ConfigLoader::class);
+
+        $configLoader->expects($this->once())
+            ->method('getProviderClass')
+            ->willReturn(null);
+
+        $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
+
+        $this->assertCount(2, $result);
+        $this->assertInstanceOf(ClassmapCommandProvider::class, $result[0]);
+        $this->assertInstanceOf(CommandProviderDiscovery::class, $result[1]);
+    }
+
+    public function testItBuildsDefaultAndCustomProviders(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+        $configLoader = $this->createMock(ConfigLoader::class);
+
+        $configLoader->expects($this->once())
+            ->method('getProviderClass')
+            ->willReturn(ConsoleProvider::class);
+
+        $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
+
+        $this->assertCount(3, $result);
+        $this->assertInstanceOf(ClassmapCommandProvider::class, $result[0]);
+        $this->assertInstanceOf(CommandProviderDiscovery::class, $result[1]);
+        $this->assertInstanceOf(ConsoleProvider::class, $result[2]);
     }
 }
