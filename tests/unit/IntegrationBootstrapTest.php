@@ -94,14 +94,7 @@ final class IntegrationBootstrapTest extends TestCase
         $this->assertTrue($process->isSuccessful(), 'Console list command failed');
         $this->assertStringContainsString('Console App', $process->getOutput());
         $this->assertStringContainsString('Available commands:', $process->getOutput());
-    }
 
-    #[Depends('testComposerInstallWorks')]
-    public function testBootstrapCommandAppearsInList(): void
-    {
-        $process = $this->runConsoleCommand('list');
-
-        $this->assertTrue($process->isSuccessful());
         $this->assertStringContainsString('test:bootstrap', $process->getOutput());
         $this->assertStringContainsString('Test command that proves the custom bootstrap was loaded', $process->getOutput());
     }

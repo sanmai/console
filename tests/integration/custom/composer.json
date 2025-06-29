@@ -1,6 +1,6 @@
 {
-    "name": "test/console-integration-bootstrap",
-    "description": "Integration test project for console bootstrap functionality",
+    "name": "test/console-integration-provider",
+    "description": "Integration test project for console command providers functionality",
     "require": {
         "sanmai/console": "*"
     },
@@ -14,12 +14,12 @@
     ],
     "autoload": {
         "psr-4": {
-            "TestApp\\": "src/"
+            "TestProviderApp\\": "src/"
         }
     },
     "extra": {
         "console": {
-            "bootstrap": "bootstrap.php"
+            "provider": "TestProviderApp\\ConsoleProvider"
         }
     }
 }
