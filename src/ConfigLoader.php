@@ -57,11 +57,14 @@ final class ConfigLoader
         return $file->fread($file->getSize());
     }
 
+    /**
+     * @return iterable<object>
+     */
     private function getConfig(): iterable
     {
         $path = $this->rootPackage['install_path'] . '/composer.json';
 
-        yield json_decode(
+        yield (object) json_decode(
             json: (string) $this->readFile($path),
             associative: false,
             flags: JSON_THROW_ON_ERROR,
