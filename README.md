@@ -193,11 +193,8 @@ class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggre
         yield new DatabaseMigrationCommand($database);
         yield new CacheClearCommand($cache);
 
-        // ...or return an array iterator
-        // return new ArrayIterator([
-        //     new DatabaseMigrationCommand($database),
-        //     new CacheClearCommand($cache),
-        // ]);
+        // ...or return a variety of iterators,
+        // ...or implement a full iterator
     }
 }
 ```
