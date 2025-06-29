@@ -153,7 +153,7 @@ In addition to auto-discovery, you can specify a custom command provider:
 Or using Composer command:
 
 ```bash
-composer config extra.console.provider 'App\\Console\\CommandProvider'
+composer config extra.console.provider 'App\Console\CommandProvider'
 ```
 
 The custom provider:
