@@ -53,8 +53,8 @@ final class CommandProviderProviderTest extends TestCase
         $configLoader = $this->createMock(ConfigLoader::class);
 
         $configLoader->expects($this->once())
-            ->method('getProviderClass')
-            ->willReturn(null);
+            ->method('getProviderClasses')
+            ->willReturn([]);
 
         $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
 
@@ -69,8 +69,8 @@ final class CommandProviderProviderTest extends TestCase
         $configLoader = $this->createMock(ConfigLoader::class);
 
         $configLoader->expects($this->once())
-            ->method('getProviderClass')
-            ->willReturn(ConsoleProvider::class);
+            ->method('getProviderClasses')
+            ->willReturn([ConsoleProvider::class]);
 
         $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
 
@@ -78,5 +78,23 @@ final class CommandProviderProviderTest extends TestCase
         $this->assertInstanceOf(ClassmapCommandProvider::class, $result[0]);
         $this->assertInstanceOf(CommandProviderDiscovery::class, $result[1]);
         $this->assertInstanceOf(ConsoleProvider::class, $result[2]);
+    }
+
+    public function testItBuildsDefaultAndMultipleCustomProviders(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+        $configLoader = $this->createMock(ConfigLoader::class);
+
+        $configLoader->expects($this->once())
+            ->method('getProviderClasses')
+            ->willReturn([
+                ConsoleProvider::class,
+                ConsoleProvider::class,
+            ]);
+
+        $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
+
+        $this->assertCount(4, $result);
+        $this->assertInstanceOf(ConsoleProvider::class, $result[3]);
     }
 }

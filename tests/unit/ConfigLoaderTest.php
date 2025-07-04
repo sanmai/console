@@ -62,8 +62,8 @@ final class ConfigLoaderTest extends TestCase
         ]);
 
         $this->assertSame(
-            \TestProviderApp\ConsoleProvider::class,
-            $configLoader->getProviderClass()
+            [\TestProviderApp\ConsoleProvider::class],
+            $configLoader->getProviderClasses()
         );
     }
 
@@ -73,7 +73,7 @@ final class ConfigLoaderTest extends TestCase
 
         $configLoader = new ConfigLoader($classLoader);
 
-        $this->assertNull($configLoader->getProviderClass());
+        $this->assertSame([], $configLoader->getProviderClasses());
     }
 
     public function testGetBootstrapPathFileReadError(): void
@@ -107,7 +107,7 @@ final class ConfigLoaderTest extends TestCase
             ->willReturn('{}');
 
         $this->assertSame('', $configLoader->getBootstrapPath());
-        $this->assertNull($configLoader->getProviderClass());
+        $this->assertSame([], $configLoader->getProviderClasses());
     }
 
     public function testAutoloaderCount(): void
