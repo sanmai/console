@@ -88,13 +88,12 @@ final class ConfigLoader
     public function getProviderClass(): array
     {
         // @phpstan-ignore-next-line
-        $configData = $this->config->get();
-        if (!isset($configData->extra->console->provider)) {
+        if (!isset($this->config->get()->extra->console->provider)) {
             return [];
         }
 
         // @phpstan-ignore return.type
-        return (array) $configData->extra->console->provider;
+        return (array) $this->config->get()->extra->console->provider;
     }
 
     public function handleAutoloader(callable $callback): void
