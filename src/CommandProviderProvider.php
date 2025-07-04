@@ -57,9 +57,7 @@ final class CommandProviderProvider implements IteratorAggregate, CommandProvide
         yield new CommandProviderDiscovery($classLoader);
 
         // Custom provider goes last to make sure it can override any commands from the default providers
-        $providerClass = $configLoader->getProviderClass();
-
-        if (null !== $providerClass) {
+        foreach ($configLoader->getProviderClass() as $providerClass) {
             yield new $providerClass();
         }
     }

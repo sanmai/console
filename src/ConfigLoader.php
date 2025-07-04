@@ -82,12 +82,18 @@ final class ConfigLoader
 
     /**
      * Returns the class name of the command provider.
-     * @return class-string<CommandProviderInterface>|null
+     *
+     * @return array<class-string<CommandProviderInterface>>
      */
-    public function getProviderClass(): ?string
+    public function getProviderClass(): array
     {
         // @phpstan-ignore-next-line
-        return $this->config->get()->extra->console->provider ?? null;
+        if (!isset($this->config->get()->extra->console->provider)) {
+            return [];
+        }
+
+        // @phpstan-ignore return.type
+        return (array) $this->config->get()->extra->console->provider;
     }
 
     public function handleAutoloader(callable $callback): void

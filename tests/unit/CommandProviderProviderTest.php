@@ -54,7 +54,7 @@ final class CommandProviderProviderTest extends TestCase
 
         $configLoader->expects($this->once())
             ->method('getProviderClass')
-            ->willReturn(null);
+            ->willReturn([]);
 
         $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
 
@@ -70,7 +70,7 @@ final class CommandProviderProviderTest extends TestCase
 
         $configLoader->expects($this->once())
             ->method('getProviderClass')
-            ->willReturn(ConsoleProvider::class);
+            ->willReturn([ConsoleProvider::class]);
 
         $result = [...CommandProviderProvider::defaultProviders($configLoader, $classLoader)];
 
