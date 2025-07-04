@@ -85,7 +85,7 @@ final class ConfigLoader
      *
      * @return array<class-string<CommandProviderInterface>>
      */
-    public function getProviderClass(): array
+    public function getProviderClasses(): array
     {
         // @phpstan-ignore-next-line
         if (!isset($this->config->get()->extra->console->provider)) {
