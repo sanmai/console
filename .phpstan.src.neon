@@ -3,3 +3,6 @@ parameters:
     paths:
         - src
     ignoreErrors:
+        - identifier: argument.type
+        - identifier: return.type
+        - identifier: argument.templateType

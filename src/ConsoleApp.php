@@ -47,7 +47,6 @@ final class ConsoleApp extends Application
     #[Override]
     protected function getDefaultCommands(): array
     {
-        // @phpstan-ignore-next-line
         return take(parent::getDefaultCommands())
             ->append($this->commandProvider)
             ->toList();
