@@ -11,9 +11,9 @@
     ],
     "require": {
         "php": ">=8.2",
-        "sanmai/later": ">=0.1.7",
-        "sanmai/pipeline": ">=6.17",
-        "sanmai/version-info": ">=0.2",
+        "sanmai/later": "^0.1.7 || ^0.2",
+        "sanmai/pipeline": "^6.17 || ^7.0",
+        "sanmai/version-info": "^0.2 || ^0.3",
         "symfony/console": "^6.0 || ^7.0"
     },
     "require-dev": {
