@@ -44,7 +44,7 @@ final class ConfigLoader
      * @param array{install_path: string}|null $rootPackage
      */
     public function __construct(
-        readonly private ClassLoader $classLoader,
+        private readonly ClassLoader $classLoader,
         ?array $rootPackage = null,
     ) {
         $this->rootPackage = $rootPackage ?? InstalledVersions::getRootPackage();
