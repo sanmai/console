@@ -22,7 +22,11 @@ use ConsoleApp\CommandProviderDiscovery;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\CommandProviderHelper\Helper;
+use DIContainer\Container;
+use Psr\Container\ContainerInterface;
 use Tests\ConsoleApp\Fixtures\AbstractCommand;
+use Tests\ConsoleApp\Fixtures\Greeter;
+use Tests\ConsoleApp\Fixtures\GreeterCommand;
 use Tests\ConsoleApp\Fixtures\HelloCommand;
 use Tests\ConsoleApp\Fixtures\TestCommandProvider;
 
@@ -78,6 +82,17 @@ class HelperTest extends TestCase
         );
 
         $this->assertNull($this->helper->newCommand(AbstractCommand::class));
+        $this->assertNull($this->helper->newCommand(GreeterCommand::class));
+    }
+
+    public function testNewCommandUsesContainer(): void
+    {
+        $helper = new Helper(new Container());
+
+        $command = $helper->newCommand(GreeterCommand::class);
+
+        $this->assertInstanceOf(GreeterCommand::class, $command);
+        $this->assertInstanceOf(Greeter::class, $command->greeter);
     }
 
     public function testItChecksOurNamespace(): void
@@ -108,6 +123,21 @@ class HelperTest extends TestCase
         $commands = iterator_to_array($provider);
         $this->assertCount(2, $commands);
         $this->assertInstanceOf(HelloCommand::class, $commands[0]);
+    }
+
+    public function testNewCommandProviderUsesContainer(): void
+    {
+        $expected = new TestCommandProvider();
+
+        $container = $this->createMock(ContainerInterface::class);
+        $container->expects($this->once())
+            ->method('get')
+            ->with(TestCommandProvider::class)
+            ->willReturn($expected);
+
+        $helper = new Helper($container);
+
+        $this->assertSame($expected, $helper->newCommandProvider(TestCommandProvider::class));
     }
 
 }

@@ -84,6 +84,11 @@ This library provides a ready-made `vendor/bin/console` executable that automati
    - Provider returns command instances via its iterator
    - Works alongside auto-discovery
 
+3. Container (optional):
+   - Loads the [PSR-11](https://www.php-fig.org/psr/psr-11/) container specified in `extra.console.container`
+   - Creates discovered commands and providers with `$container->get($class)` instead of `new $class()`
+   - Lets commands and providers have constructor dependencies
+
 ## The Problem It Solves
 
 I found myself writing [the same console bootstrap script](https://symfony.com/doc/current/components/console.html#creating-a-console-application) over and over. Even with Symfony's command discovery features, you still had to write a lot of boilerplate code.
@@ -156,9 +161,67 @@ The custom provider:
 - Works alongside auto-discovery (doesn't replace it)
 - Doesn't need the `CommandProvider` suffix
 - Must implement `CommandProviderInterface`
-- Must have a no-argument constructor
+- Must have a no-argument constructor, unless a [container](#container-configuration) is configured
 
 An optimized autoloader is not required to use the custom provider.
+
+### Container Configuration
+
+To create commands and providers with a dependency injection container, specify a class implementing `Psr\Container\ContainerInterface`:
+
+```json
+{
+    "extra": {
+        "console": {
+            "container": "App\\Container"
+        }
+    }
+}
+```
+
+Or using Composer command:
+
+```bash
+composer config extra.console.container 'App\Container'
+```
+
+The container:
+
+- Is instantiated with a no-argument constructor
+- Replaces `new $class()` for every discovered command and provider, and for the custom provider
+- Must be able to create a command or provider by its class name, so an autowiring container is the natural fit
+
+A command that the container cannot create is skipped, the same as a command whose constructor throws. No fallback to `new $class()` happens: when a container is configured, the container is the authority.
+
+For example, with [sanmai/di-container](https://github.com/sanmai/di-container):
+
+```bash
+composer require sanmai/di-container
+composer config extra.console.container 'DIContainer\Container'
+```
+
+Now commands with constructor dependencies are discovered and wired automatically:
+
+```php
+<?php
+// src/Commands/GreetCommand.php
+namespace App\Commands;
+
+use App\Greeter;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+
+#[AsCommand(name: 'greet')]
+class GreetCommand extends Command
+{
+    public function __construct(private readonly Greeter $greeter)
+    {
+        parent::__construct();
+    }
+}
+```
+
+To configure bindings, extend the container class and pass them to the parent constructor.
 
 ## Commands with Dependencies
 
@@ -194,7 +257,7 @@ class DatabaseCommandProvider implements CommandProviderInterface, IteratorAggre
 }
 ```
 
-`CommandProviderInterface` implementations must have no required arguments in their constructor as they are instantiated automatically.
+`CommandProviderInterface` implementations must have no required arguments in their constructor as they are instantiated automatically, unless a [container](#container-configuration) is configured. With a container, both commands and providers can declare constructor dependencies.
 
 ## Troubleshooting
 
@@ -205,6 +268,7 @@ Commands not showing up?
 - Check that commands extend `Symfony\Component\Console\Command\Command`
 - Commands in `vendor/` are ignored by default
 - Command providers must have class names ending with `CommandProvider`
+- With a container configured, make sure the container can create the command by its class name
 
 ## Testing
 

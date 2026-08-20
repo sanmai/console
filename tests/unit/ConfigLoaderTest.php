@@ -21,7 +21,9 @@ namespace Tests\ConsoleApp;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use ConsoleApp\ConfigLoader;
+use ConsoleApp\NewInstanceContainer;
 use Composer\Autoload\ClassLoader;
+use DIContainer\Container;
 use JsonException;
 
 #[CoversClass(ConfigLoader::class)]
@@ -76,6 +78,26 @@ final class ConfigLoaderTest extends TestCase
         $this->assertSame([], $configLoader->getProviderClasses());
     }
 
+    public function testGetContainer(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $configLoader = new ConfigLoader($classLoader, [
+            'install_path' => __DIR__ . '/../integration/container',
+        ]);
+
+        $this->assertInstanceOf(Container::class, $configLoader->getContainer());
+    }
+
+    public function testGetContainerNone(): void
+    {
+        $classLoader = $this->createMock(ClassLoader::class);
+
+        $configLoader = new ConfigLoader($classLoader);
+
+        $this->assertInstanceOf(NewInstanceContainer::class, $configLoader->getContainer());
+    }
+
     public function testGetBootstrapPathFileReadError(): void
     {
         $classLoader = $this->createMock(ClassLoader::class);
@@ -108,6 +130,7 @@ final class ConfigLoaderTest extends TestCase
 
         $this->assertSame('', $configLoader->getBootstrapPath());
         $this->assertSame([], $configLoader->getProviderClasses());
+        $this->assertInstanceOf(NewInstanceContainer::class, $configLoader->getContainer());
     }
 
     public function testAutoloaderCount(): void
