@@ -34,11 +34,14 @@ use function Pipeline\take;
  */
 final class CommandProviderProvider implements IteratorAggregate, CommandProviderInterface
 {
-    /** @var array<CommandProviderInterface> */
+    /** @var array<Traversable<Command>> */
     private readonly array $providers;
 
+    /**
+     * @param Traversable<Command> ...$providers
+     */
     public function __construct(
-        CommandProviderInterface ...$providers,
+        Traversable ...$providers,
     ) {
         $this->providers = $providers;
     }
