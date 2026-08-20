@@ -28,7 +28,7 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2",
         "phpunit/phpunit": "^11.5.25",
-        "sanmai/di-container": "^0.1.21",
+        "sanmai/di-container": "^0.1 || ^0.2",
         "symfony/process": "^7.3"
     },
     "autoload": {
