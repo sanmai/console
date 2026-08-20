@@ -50,7 +50,7 @@ final class CommandProviderProvider implements IteratorAggregate, CommandProvide
     }
 
     /**
-     * @return Traversable<CommandProviderInterface>
+     * @return Traversable<Traversable<Command>>
      */
     public static function defaultProviders(ConfigLoader $configLoader, ClassLoader $classLoader): Traversable
     {
