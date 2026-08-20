@@ -27,6 +27,10 @@ use function class_exists;
 
 /**
  * Default container: creates a new instance of the class with no arguments.
+ *
+ * Not a PSR-11 compliant container: get() throws whatever `new $id()` throws.
+ *
+ * @internal
  */
 final class NewInstanceContainer implements ContainerInterface
 {
