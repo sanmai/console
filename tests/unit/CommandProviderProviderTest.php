@@ -21,6 +21,7 @@ namespace Tests\ConsoleApp;
 use ConsoleApp\ClassmapCommandProvider;
 use ConsoleApp\CommandProviderDiscovery;
 use ConsoleApp\CommandProviderProvider;
+use ConsoleApp\NewInstanceContainer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use TestProviderApp\ConsoleProvider;
@@ -51,6 +52,8 @@ final class CommandProviderProviderTest extends TestCase
     {
         $classLoader = $this->createMock(ClassLoader::class);
         $configLoader = $this->createMock(ConfigLoader::class);
+        $configLoader->method('getContainer')
+            ->willReturn(new NewInstanceContainer());
 
         $configLoader->expects($this->once())
             ->method('getProviderClasses')
@@ -67,6 +70,8 @@ final class CommandProviderProviderTest extends TestCase
     {
         $classLoader = $this->createMock(ClassLoader::class);
         $configLoader = $this->createMock(ConfigLoader::class);
+        $configLoader->method('getContainer')
+            ->willReturn(new NewInstanceContainer());
 
         $configLoader->expects($this->once())
             ->method('getProviderClasses')
@@ -84,6 +89,8 @@ final class CommandProviderProviderTest extends TestCase
     {
         $classLoader = $this->createMock(ClassLoader::class);
         $configLoader = $this->createMock(ConfigLoader::class);
+        $configLoader->method('getContainer')
+            ->willReturn(new NewInstanceContainer());
 
         $configLoader->expects($this->once())
             ->method('getProviderClasses')
