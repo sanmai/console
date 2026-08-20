@@ -19,6 +19,8 @@
 namespace ConsoleApp\CommandProviderHelper;
 
 use ConsoleApp\CommandProviderInterface;
+use ConsoleApp\NewInstanceContainer;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Throwable;
 use Traversable;
@@ -34,8 +36,9 @@ final class Helper
 {
     private readonly string $namespacePrefix;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly ContainerInterface $container = new NewInstanceContainer(),
+    ) {
         /** @psalm-suppress PossiblyFalseOperand */
         $this->namespacePrefix = strstr(self::class, '\\', true) . '\\';
     }
@@ -75,12 +78,11 @@ final class Helper
 
     /**
      * @param class-string<Command> $class
-     * @psalm-suppress UnsafeInstantiation
      */
     public function newCommand(string $class): ?Command
     {
         try {
-            return new $class();
+            return $this->container->get($class);
         } catch (Throwable) {
             return null;
         }
@@ -110,10 +112,9 @@ final class Helper
     /**
      * @param class-string<CommandProviderInterface> $class
      * @return Traversable<Command>
-     * @psalm-suppress UnsafeInstantiation
      */
     public function newCommandProvider(string $class): Traversable
     {
-        return new $class();
+        return $this->container->get($class);
     }
 }
