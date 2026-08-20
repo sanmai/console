@@ -22,6 +22,7 @@ namespace ConsoleApp;
 
 use Composer\InstalledVersions;
 use Later\Interfaces\Deferred;
+use Psr\Container\ContainerInterface;
 use SplFileObject;
 use Composer\Autoload\ClassLoader;
 
@@ -94,6 +95,17 @@ final class ConfigLoader
 
         // @phpstan-ignore return.type
         return (array) $this->config->get()->extra->console->provider;
+    }
+
+    /**
+     * Returns the container that creates commands and providers.
+     */
+    public function getContainer(): ContainerInterface
+    {
+        // @phpstan-ignore-next-line
+        $containerClass = $this->config->get()->extra->console->container ?? NewInstanceContainer::class;
+
+        return new $containerClass();
     }
 
     public function handleAutoloader(callable $callback): void
