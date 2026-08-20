@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": ">=8.2",
+        "psr/container": "^1.1.2 || ^2.0",
         "sanmai/later": "^0.1.7 || ^0.2",
         "sanmai/pipeline": "^6.17 || ^7.0",
         "sanmai/version-info": "^0.2 || ^0.3",
@@ -27,7 +28,6 @@
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2",
         "phpunit/phpunit": "^11.5.25",
-        "psr/container": "^1.1.2 || ^2.0",
         "sanmai/di-container": "^0.1.21",
         "symfony/process": "^7.3"
     },
