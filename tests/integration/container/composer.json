@@ -3,7 +3,7 @@
     "description": "Integration test project for console container functionality",
     "require": {
         "sanmai/console": "*",
-        "sanmai/di-container": "^0.1 || ^0.2"
+        "sanmai/di-container": "^0.2"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
